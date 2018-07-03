@@ -26,6 +26,7 @@
 #ifndef M68KCPU__HEADER
 #define M68KCPU__HEADER
 
+#include <stdint.h>
 #include "m68k.h"
 #include <limits.h>
 
@@ -56,6 +57,7 @@
 #undef sint
 #undef uint
 
+#define uint uint32_t
 #define sint8  signed   char      /* ASG: changed from char to signed char */
 #define sint16 signed   short
 #define sint32 signed   int      /* AWJ: changed from long to int */
@@ -65,7 +67,7 @@
 
 /* signed and unsigned int must be at least 32 bits wide */
 #define sint   signed   int
-#define uint   unsigned int
+
 
 
 #if M68K_USE_64_BIT

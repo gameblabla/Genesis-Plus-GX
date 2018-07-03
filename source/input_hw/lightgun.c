@@ -32,7 +32,7 @@
 /*                                                                                  */
 /************************************************************************************/
 
-static const uint8 hc_256[171] =
+static const uint8_t hc_256[171] =
 {
   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
   0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
@@ -48,7 +48,7 @@ static const uint8 hc_256[171] =
   0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
 
-static const uint8 hc_320[210] =
+static const uint8_t hc_320[210] =
 {
   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
   0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
@@ -69,12 +69,12 @@ static const uint8 hc_320[210] =
 
 static struct
 {
-  uint8 State;
-  uint8 Port;
+  uint8_t State;
+  uint8_t Port;
 } lightgun;
 
 
-void lightgun_reset(int port)
+void lightgun_reset(int32_t port)
 {
   input.analog[port][0] = bitmap.viewport.w >> 1;
   input.analog[port][1] = bitmap.viewport.h >> 1;
@@ -82,7 +82,7 @@ void lightgun_reset(int port)
   lightgun.Port = 4;
 }
 
-void lightgun_refresh(int port)
+void lightgun_refresh(int32_t port)
 {
   /* Check that lightgun is enabled */
   if (port == lightgun.Port)
@@ -124,20 +124,20 @@ void lightgun_refresh(int port)
 /*  Sega Phaser                                                             */
 /*--------------------------------------------------------------------------*/
 
-static inline unsigned char phaser_read(int port)
+static inline uint8_t phaser_read(int32_t port)
 {
   /* FIRE button status (active low) */
-  unsigned char temp = ~(input.pad[port] & 0x10);
+  uint8_t temp = ~(input.pad[port] & 0x10);
 
   /* Check that TH is set as an input */
   if (io_reg[0] & (0x02 << (port >> 1)))
   {
     /* Get current X position (phaser is only used in MS compatiblity mode) */
-    int hcounter = hctab[(mcycles_z80 + Z80_CYCLE_OFFSET) % MCYCLES_PER_LINE];
+    int32_t hcounter = hctab[(mcycles_z80 + Z80_CYCLE_OFFSET) % MCYCLES_PER_LINE];
 
     /* Compare with gun position */
-    int dx = input.analog[port][0] - (hcounter << 1);
-    int dy = input.analog[port][1] - (v_counter);
+    int32_t dx = input.analog[port][0] - (hcounter << 1);
+    int32_t dy = input.analog[port][1] - (v_counter);
 
     /* Check if current pixel is within lightgun spot ? */
     if ((abs(dy) <= 5) && (abs(dx) <= 60))
@@ -162,12 +162,12 @@ static inline unsigned char phaser_read(int port)
   return temp & 0x7F;
 }
 
-unsigned char phaser_1_read(void)
+uint8_t phaser_1_read(void)
 {
   return phaser_read(0);
 }
 
-unsigned char phaser_2_read(void)
+uint8_t phaser_2_read(void)
 {
   return phaser_read(4);
 }
@@ -177,7 +177,7 @@ unsigned char phaser_2_read(void)
 /*  Sega Menacer                                                            */
 /*--------------------------------------------------------------------------*/
 
-unsigned char menacer_read(void)
+uint8_t menacer_read(void)
 {
   /* Return START,A,B,C buttons status in D0-D3 (active high) */
   /* TL & TR pins always return 0 (normally set as output) */
@@ -189,7 +189,7 @@ unsigned char menacer_read(void)
 /*  Konami Justifiers                                                       */
 /*--------------------------------------------------------------------------*/
 
-unsigned char justifier_read(void)
+uint8_t justifier_read(void)
 {
   /* Gun detection */
   if (lightgun.State & 0x40)
@@ -203,7 +203,7 @@ unsigned char justifier_read(void)
   return (((~input.pad[lightgun.Port] >> 6) & 0x03) | 0x70);
 }
 
-void justifier_write(unsigned char data, unsigned char mask)
+void justifier_write(uint8_t data, uint8_t mask)
 {
   /* update bits set as output only */
   data = (lightgun.State & ~mask) | (data & mask);

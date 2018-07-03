@@ -58,7 +58,7 @@ static void correct_errors( md_ntsc_rgb_t color, md_ntsc_rgb_t* out )
 
 void md_ntsc_init( md_ntsc_t* ntsc, md_ntsc_setup_t const* setup )
 {
-  int entry;
+  int32_t entry;
   init_t impl;
   if ( !setup )
     setup = &md_ntsc_composite;
@@ -72,7 +72,7 @@ void md_ntsc_init( md_ntsc_t* ntsc, md_ntsc_setup_t const* setup )
 
     float y, i, q = RGB_TO_YIQ( rr, gg, bb, y, i );
 
-    int r, g, b = YIQ_TO_RGB( y, i, q, impl.to_rgb, int, r, g );
+    int32_t r, g, b = YIQ_TO_RGB( y, i, q, impl.to_rgb, int, r, g );
     md_ntsc_rgb_t rgb = PACK_RGB( r, g, b );
 
     if ( setup->palette_out )
@@ -88,10 +88,10 @@ void md_ntsc_init( md_ntsc_t* ntsc, md_ntsc_setup_t const* setup )
 
 #ifndef MD_NTSC_NO_BLITTERS
 /* modified blitters to work on a line basis with genesis plus renderer*/
-void md_ntsc_blit( md_ntsc_t const* ntsc, MD_NTSC_IN_T const* table, unsigned char* input,
-                   int in_width, int vline)
+void md_ntsc_blit( md_ntsc_t const* ntsc, MD_NTSC_IN_T const* table, uint8_t* input,
+                   int32_t in_width, int32_t vline)
 {
-  int const chunk_count = in_width / md_ntsc_in_chunk - 1;
+  int32_t const chunk_count = in_width / md_ntsc_in_chunk - 1;
   MD_NTSC_IN_T border = table[0];
 
   MD_NTSC_BEGIN_ROW( ntsc, border,
@@ -104,13 +104,13 @@ void md_ntsc_blit( md_ntsc_t const* ntsc, MD_NTSC_IN_T const* table, unsigned ch
   /* one tile is 32 byte = 4x4 pixels */
   /* tiles are stored continuously in texture memory */
   in_width = MD_NTSC_OUT_WIDTH(in_width) >> 2;
-  int offset = ((in_width << 5) * (vline >> 2)) + ((vline & 3) * 8);
+  int32_t offset = ((in_width << 5) * (vline >> 2)) + ((vline & 3) * 8);
   md_ntsc_out_t* restrict line_out  = (md_ntsc_out_t*)(texturemem + offset);
 #else
   md_ntsc_out_t* restrict line_out  = (md_ntsc_out_t*)(&bitmap.data[(vline * bitmap.pitch)]);
 #endif
 
-  int n;
+  int32_t n;
 
   for ( n = chunk_count; n; --n )
   {

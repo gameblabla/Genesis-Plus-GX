@@ -25,40 +25,40 @@
 #define _RENDER_H_
 
 /* Global variables */
-extern uint8 object_count;
+extern uint8_t object_count;
 
 /* Function prototypes */
 extern void render_init(void);
 extern void render_reset(void);
-extern void render_line(int line);
-extern void blank_line(int line, int offset, int width);
-extern void remap_line(int line);
-extern void window_clip(unsigned int data, unsigned int sw);
-extern void render_bg_m4(int line, int width);
-extern void render_bg_m5(int line, int width);
-extern void render_bg_m5_vs(int line, int width);
-extern void render_bg_m5_im2(int line, int width);
-extern void render_bg_m5_im2_vs(int line, int width);
-extern void render_obj_m4(int max_width);
-extern void render_obj_m5(int max_width);
-extern void render_obj_m5_ste(int max_width);
-extern void render_obj_m5_im2(int max_width);
-extern void render_obj_m5_im2_ste(int max_width);
-extern void parse_satb_m4(int line);
-extern void parse_satb_m5(int line);
-extern void update_bg_pattern_cache_m4(int index);
-extern void update_bg_pattern_cache_m5(int index);
+extern void render_line(int32_t line);
+extern void blank_line(int32_t line, int32_t offset, int32_t width);
+extern void remap_line(int32_t line);
+extern void window_clip(uint32_t data, uint32_t sw);
+extern void render_bg_m4(int32_t line, int32_t width);
+extern void render_bg_m5(int32_t line, int32_t width);
+extern void render_bg_m5_vs(int32_t line, int32_t width);
+extern void render_bg_m5_im2(int32_t line, int32_t width);
+extern void render_bg_m5_im2_vs(int32_t line, int32_t width);
+extern void render_obj_m4(int32_t max_width);
+extern void render_obj_m5(int32_t max_width);
+extern void render_obj_m5_ste(int32_t max_width);
+extern void render_obj_m5_im2(int32_t max_width);
+extern void render_obj_m5_im2_ste(int32_t max_width);
+extern void parse_satb_m4(int32_t line);
+extern void parse_satb_m5(int32_t line);
+extern void update_bg_pattern_cache_m4(int32_t index);
+extern void update_bg_pattern_cache_m5(int32_t index);
 #ifdef NGC
-extern void color_update(int index, unsigned int data);
+extern void color_update(int32_t index, uint32_t data);
 #endif
 
 /* Function pointers */
-extern void (*render_bg)(int line, int width);
-extern void (*render_obj)(int max_width);
-extern void (*parse_satb)(int line);
-extern void (*update_bg_pattern_cache)(int index);
+extern void (*render_bg)(int32_t line, int32_t width);
+extern void (*render_obj)(int32_t max_width);
+extern void (*parse_satb)(int32_t line);
+extern void (*update_bg_pattern_cache)(int32_t index);
 #ifndef NGC
-extern void (*color_update)(int index, unsigned int data);
+extern void (*color_update)(int32_t index, uint32_t data);
 #endif
 
 #endif /* _RENDER_H_ */

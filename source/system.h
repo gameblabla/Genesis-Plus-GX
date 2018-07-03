@@ -35,41 +35,41 @@
 
 typedef struct
 {
-  uint8 *data;      /* Bitmap data */
-  int width;        /* Bitmap width */
-  int height;       /* Bitmap height */
-  int depth;        /* Color depth (8-32 bits) */
-  int pitch;        /* Width of bitmap in bytes */
-  int granularity;  /* Size of each pixel in bytes */
-  int remap;        /* 1= Translate pixel data */
+  uint8_t *data;      /* Bitmap data */
+  int32_t width;        /* Bitmap width */
+  int32_t height;       /* Bitmap height */
+  int32_t depth;        /* Color depth (8-32 bits) */
+  int32_t pitch;        /* Width of bitmap in bytes */
+  int32_t granularity;  /* Size of each pixel in bytes */
+  int32_t remap;        /* 1= Translate pixel data */
   struct
   {
-    int x;          /* X offset of viewport within bitmap */
-    int y;          /* Y offset of viewport within bitmap */
-    int w;          /* Width of viewport */
-    int h;          /* Height of viewport */
-    int ow;         /* Previous width of viewport */
-    int oh;         /* Previous height of viewport */
-    int changed;    /* 1= Viewport width or height have changed */
+    int32_t x;          /* X offset of viewport within bitmap */
+    int32_t y;          /* Y offset of viewport within bitmap */
+    int32_t w;          /* Width of viewport */
+    int32_t h;          /* Height of viewport */
+    int32_t ow;         /* Previous width of viewport */
+    int32_t oh;         /* Previous height of viewport */
+    int32_t changed;    /* 1= Viewport width or height have changed */
   } viewport;
 } t_bitmap;
 
 typedef struct
 {
-  int sample_rate;  /* Output Sample rate (8000-48000) */
+  int32_t sample_rate;  /* Output Sample rate (8000-48000) */
   float frame_rate; /* Output Frame rate (usually 50 or 60 frames per second) */
-  int enabled;      /* 1= sound emulation is enabled */
-  int buffer_size;  /* Size of sound buffer (in bytes) */
-  int16 *buffer[2]; /* Signed 16-bit stereo sound data */
+  int32_t enabled;      /* 1= sound emulation is enabled */
+  int32_t buffer_size;  /* Size of sound buffer (in bytes) */
+  int16_t *buffer[2]; /* Signed 16-bit stereo sound data */
   struct
   {
-    int32 *pos;
-    int32 *buffer;
+    int32_t *pos;
+    int32_t *buffer;
   } fm;
   struct
   {
-    int16 *pos;
-    int16 *buffer;
+    int16_t *pos;
+    int16_t *buffer;
   } psg;
 } t_snd;
 
@@ -77,21 +77,21 @@ typedef struct
 /* Global variables */
 extern t_bitmap bitmap;
 extern t_snd snd;
-extern uint32 mcycles_z80;
-extern uint32 mcycles_68k;
-extern uint32 mcycles_vdp;
-extern uint8 system_hw;
+extern uint32_t mcycles_z80;
+extern uint32_t mcycles_68k;
+extern uint32_t mcycles_vdp;
+extern uint8_t system_hw;
 
 /* Function prototypes */
-extern int audio_init(int samplerate,float framerate);
+extern int32_t audio_init(int32_t samplerate,float framerate);
 extern void audio_reset(void);
 extern void audio_shutdown(void);
-extern int audio_update(void);
+extern int32_t audio_update(void);
 extern void audio_set_equalizer(void);
 extern void system_init(void);
 extern void system_reset(void);
 extern void system_shutdown(void);
-extern void (*system_frame)(int do_skip);
+extern void (*system_frame)(int32_t do_skip);
 
 #endif /* _SYSTEM_H_ */
 

@@ -24,10 +24,10 @@
 #define _SPORTSPAD_H_
 
 /* Function prototypes */
-extern void sportspad_reset(int index);
-extern unsigned char sportspad_1_read(void);
-extern unsigned char sportspad_2_read(void);
-extern void sportspad_1_write(unsigned char data, unsigned char mask);
-extern void sportspad_2_write(unsigned char data, unsigned char mask);
+extern void sportspad_reset(int32_t index);
+extern uint8_t sportspad_1_read(void);
+extern uint8_t sportspad_2_read(void);
+extern void sportspad_1_write(uint8_t data, uint8_t mask);
+extern void sportspad_2_write(uint8_t data, uint8_t mask);
 
 #endif

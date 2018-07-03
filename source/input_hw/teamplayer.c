@@ -24,16 +24,16 @@
 
 static struct
 {
-  uint8 State;
-  uint8 Counter;
-  uint8 Table[12];
+  uint8_t State;
+  uint8_t Counter;
+  uint8_t Table[12];
 } teamplayer[2];
 
 
-void teamplayer_init(int port)
+void teamplayer_init(int32_t port)
 {
-  int i,padnum;
-  int index = 0;
+  int32_t i,padnum;
+  int32_t index = 0;
 
   /* this table determines which gamepad input should be returned during acquisition sequence
      index  = teamplayer read table index: 0=1st read, 1=2nd read, ...
@@ -58,15 +58,15 @@ void teamplayer_init(int port)
   }
 }
 
-void teamplayer_reset(int port)
+void teamplayer_reset(int32_t port)
 {
   teamplayer[port].State = 0x60; /* TH = 1, TR = 1 */
   teamplayer[port].Counter = 0;
 }
 
-static inline unsigned int teamplayer_read(int port)
+static inline uint32_t teamplayer_read(int32_t port)
 {
-  unsigned int counter = teamplayer[port].Counter;
+  uint32_t counter = teamplayer[port].Counter;
 
   /* acquisition sequence */
   switch (counter)
@@ -93,7 +93,7 @@ static inline unsigned int teamplayer_read(int port)
     case 6:
     case 7: /* PAD type */
     {
-      unsigned int retval = input.dev[(port << 2) + (counter - 4)];
+      uint32_t retval = input.dev[(port << 2) + (counter - 4)];
 
       /* TL should match TR */
       return (((teamplayer[port].State & 0x20) >> 1) | retval);
@@ -101,10 +101,10 @@ static inline unsigned int teamplayer_read(int port)
 
     default: /* PAD status */
     {
-      unsigned int retval = 0x0F;
+      uint32_t retval = 0x0F;
 
       /* SEGA teamplayer returns successively PAD1 -> PAD2 -> PAD3 -> PAD4 inputs */
-      unsigned int padnum = teamplayer[port].Table[counter - 8] >> 4;
+      uint32_t padnum = teamplayer[port].Table[counter - 8] >> 4;
 
       /* Each PAD inputs is obtained through 2 or 3 sequential reads: RLDU -> SACB -> MXYZ */
       retval &= ~(input.pad[padnum] >> (teamplayer[port].Table[counter - 8] & 0x0F));
@@ -115,10 +115,10 @@ static inline unsigned int teamplayer_read(int port)
   }
 }
 
-static inline void teamplayer_write(int port, unsigned char data, unsigned char mask)
+static inline void teamplayer_write(int32_t port, uint8_t data, uint8_t mask)
 {
   /* update bits set as output only */
-  unsigned int state = (teamplayer[port].State & ~mask) | (data & mask);
+  uint32_t state = (teamplayer[port].State & ~mask) | (data & mask);
 
   /* TH & TR handshaking */
   if ((teamplayer[port].State ^ state) & 0x60)
@@ -139,22 +139,22 @@ static inline void teamplayer_write(int port, unsigned char data, unsigned char 
   }
 }
 
-unsigned char teamplayer_1_read(void)
+uint8_t teamplayer_1_read(void)
 {
   return teamplayer_read(0);
 }
 
-unsigned char teamplayer_2_read(void)
+uint8_t teamplayer_2_read(void)
 {
   return teamplayer_read(1);
 }
 
-void teamplayer_1_write(unsigned char data, unsigned char mask)
+void teamplayer_1_write(uint8_t data, uint8_t mask)
 {
   teamplayer_write(0, data, mask);
 }
 
-void teamplayer_2_write(unsigned char data, unsigned char mask)
+void teamplayer_2_write(uint8_t data, uint8_t mask)
 {
   teamplayer_write(1, data, mask);
 }

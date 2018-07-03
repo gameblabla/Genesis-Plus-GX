@@ -24,6 +24,8 @@
 #ifndef OSD_CPU_H
 #define OSD_CPU_H
 
+#include <stdint.h>
+
 #ifndef NGC
 #ifndef DOS
 #include "basetsd.h"
@@ -33,15 +35,6 @@
 #define TRUE 1
 #define FALSE 0
 #endif
-
-typedef unsigned char                       UINT8;
-typedef unsigned short                      UINT16;
-typedef unsigned int                        UINT32;
-__extension__ typedef unsigned long long    UINT64;
-typedef signed char                         INT8;
-typedef signed short                        INT16;
-typedef signed int                          INT32;
-__extension__ typedef signed long long      INT64;
 
 
 /******************************************************************************
@@ -54,13 +47,13 @@ __extension__ typedef signed long long      INT64;
 
 typedef union {
 #ifdef LSB_FIRST
-  struct { UINT8 l,h,h2,h3; } b;
-  struct { UINT16 l,h; } w;
+  struct { uint8_t l,h,h2,h3; } b;
+  struct { uint16_t l,h; } w;
 #else
-  struct { UINT8 h3,h2,h,l; } b;
-  struct { UINT16 h,l; } w;
+  struct { uint8_t h3,h2,h,l; } b;
+  struct { uint16_t h,l; } w;
 #endif
-  UINT32 d;
+  uint32_t d;
 }  PAIR;
 
 #endif  /* defined OSD_CPU_H */

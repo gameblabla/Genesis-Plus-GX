@@ -138,7 +138,7 @@
 /*                                                             */
 /***************************************************************/
 
-static const uint8 cycle2hc32[3420] =
+static const uint8_t cycle2hc32[3420] =
 {
   /* end of active display (16 pixels -> 160 Mcycles) , H interrupt triggered, Vcounter increment */
                                                               0x85, 0x85, 0x85, 0x85, 0x85, 0x85,
@@ -377,7 +377,7 @@ static const uint8 cycle2hc32[3420] =
   0x85, 0x85, 0x85, 0x85, 0x85, 0x85,
 };
 
-static const uint8 cycle2hc40[3420] =
+static const uint8_t cycle2hc40[3420] =
 {
   /* end of active display (16 pixels -> 128 Mcycles) , HINT triggered , Vcounter increment */
   0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5, 0xa5,

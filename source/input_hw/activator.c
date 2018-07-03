@@ -24,27 +24,27 @@
 
 static struct
 {
-  uint8 State;
-  uint8 Counter;
+  uint8_t State;
+  uint8_t Counter;
 } activator[2];
 
-void activator_reset(int index)
+void activator_reset(int32_t index)
 {
 
   activator[index].State = 0x40;
   activator[index].Counter = 0;
 }
 
-static inline unsigned char activator_read(int port)
+static inline uint8_t activator_read(int32_t port)
 {
   /* IR sensors 1-16 data (active low) */
-  uint16 data = ~input.pad[port];
+  uint16_t data = ~input.pad[port];
 
   /* Device index */
   port = port >> 2;
 
   /* D1 = D0 (data is ready) */
-  uint8 temp = (activator[port].State & 0x01) << 1;
+  uint8_t temp = (activator[port].State & 0x01) << 1;
 
   switch (activator[port].Counter)
   {
@@ -72,7 +72,7 @@ static inline unsigned char activator_read(int port)
   return temp;
 }
 
-static inline void activator_write(int index, unsigned char data, unsigned char mask)
+static inline void activator_write(int32_t index, uint8_t data, uint8_t mask)
 {
   /* update bits set as output only */
   data = (activator[index].State & ~mask) | (data & mask);
@@ -100,22 +100,22 @@ static inline void activator_write(int index, unsigned char data, unsigned char 
   activator[index].State = data;
 }
 
-unsigned char activator_1_read(void)
+uint8_t activator_1_read(void)
 {
   return activator_read(0);
 }
 
-unsigned char activator_2_read(void)
+uint8_t activator_2_read(void)
 {
   return activator_read(4);
 }
 
-void activator_1_write(unsigned char data, unsigned char mask)
+void activator_1_write(uint8_t data, uint8_t mask)
 {
   activator_write(0, data, mask);
 }
 
-void activator_2_write(unsigned char data, unsigned char mask)
+void activator_2_write(uint8_t data, uint8_t mask)
 {
   activator_write(1, data, mask);
 }

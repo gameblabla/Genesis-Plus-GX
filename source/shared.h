@@ -2,10 +2,10 @@
 #define _SHARED_H_
 
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 #include <zlib.h>
 
-#include "types.h"
 #include "macros.h"
 #include "m68k.h"
 #include "z80.h"

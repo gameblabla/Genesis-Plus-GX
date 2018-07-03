@@ -39,17 +39,17 @@
 
 typedef struct
 {
-  uint32 crc;
-  uint8 glasses_3d;
-  uint8 peripheral;
-  uint8 mapper;
-  uint8 region;
+  uint32_t crc;
+  uint8_t glasses_3d;
+  uint8_t peripheral;
+  uint8_t mapper;
+  uint8_t region;
 } rominfo_t;
 
 static struct
 {
-  uint8 fcr[4];
-  uint8 mapper;
+  uint8_t fcr[4];
+  uint8_t mapper;
 } slot;
 
 /* SMS game database */
@@ -148,16 +148,16 @@ static const rominfo_t game_list[GAME_DATABASE_CNT] =
 };
 
 /* 1K trash buffer */
-static uint8 dummy[0x400];
+static uint8_t dummy[0x400];
 
 /* Function prorotypes */
-static void mapper_8k_w(int offset, unsigned int data);
-static void mapper_16k_w(int offset, unsigned int data);
-static void write_mapper_none(unsigned int address, unsigned char data);
-static void write_mapper_sega(unsigned int address, unsigned char data);
-static void write_mapper_codies(unsigned int address, unsigned char data);
-static void write_mapper_korea(unsigned int address, unsigned char data);
-static void write_mapper_msx(unsigned int address, unsigned char data);
+static void mapper_8k_w(int32_t offset, uint32_t  data);
+static void mapper_16k_w(int32_t offset, uint32_t  data);
+static void write_mapper_none(uint32_t  address, uint8_t  data);
+static void write_mapper_sega(uint32_t  address, uint8_t  data);
+static void write_mapper_codies(uint32_t  address, uint8_t  data);
+static void write_mapper_korea(uint32_t  address, uint8_t  data);
+static void write_mapper_msx(uint32_t  address, uint8_t  data);
 
 
 void sms_cart_init(void)
@@ -166,14 +166,14 @@ void sms_cart_init(void)
   slot.mapper = MAPPER_SEGA;
 
   /* default supported peripheral  */
-  uint8 device = SYSTEM_MS_GAMEPAD;
+  uint8_t device = SYSTEM_MS_GAMEPAD;
   cart.special = 0;
 
   /* compute CRC */
-  uint32 crc = crc32(0, cart.rom, cart.romsize);
+  uint32_t crc = crc32(0, cart.rom, cart.romsize);
 
   /* detect cartridge mapper */
-  int i;
+  int32_t i;
   for (i=0; i<GAME_DATABASE_CNT; i++)
   {
     if (crc == game_list[i].crc)
@@ -248,7 +248,7 @@ void sms_cart_init(void)
 
 void sms_cart_reset(void)
 {
-  int i;
+  int32_t i;
 
   /* Unmapped memory return $FF */
   memset(dummy, 0xFF, 0x400);
@@ -306,9 +306,9 @@ void sms_cart_reset(void)
   }
 }
 
- void sms_cart_switch(int enabled)
+ void sms_cart_switch(int32_t enabled)
  {
-  int i;
+  int32_t i;
 
   if (enabled)
   {
@@ -329,13 +329,13 @@ void sms_cart_reset(void)
   }
 }
 
-int sms_cart_region_detect(void)
+int32_t sms_cart_region_detect(void)
 {
   /* compute CRC */
-  uint32 crc = crc32(0, cart.rom, cart.romsize);
+  uint32_t crc = crc32(0, cart.rom, cart.romsize);
 
   /* detect game region */
-  int i;
+  int32_t i;
   for (i=0; i<GAME_DATABASE_CNT; i++)
   {
     if (crc == game_list[i].crc)
@@ -348,16 +348,16 @@ int sms_cart_region_detect(void)
   return REGION_USA;
 }
 
-int sms_cart_context_save(uint8 *state)
+int32_t sms_cart_context_save(uint8_t *state)
 {
-  int bufferptr = 0;
+  int32_t bufferptr = 0;
   save_param(slot.fcr, sizeof(slot.fcr));
   return bufferptr;
 }
 
-int sms_cart_context_load(uint8 *state)
+int32_t sms_cart_context_load(uint8_t *state)
 {
-  int bufferptr = 0;
+  int32_t bufferptr = 0;
   load_param(slot.fcr, sizeof(slot.fcr));
 
   /* Set default memory map */
@@ -380,12 +380,12 @@ int sms_cart_context_load(uint8 *state)
 }
 
 
-void mapper_8k_w(int offset, unsigned int data)
+void mapper_8k_w(int32_t offset, uint32_t  data)
 {
-  int i;
+  int32_t i;
 
   /* cartridge ROM page (8k) */
-  uint8 page = data % (cart.romsize >> 13);
+  uint8_t page = data % (cart.romsize >> 13);
   
   /* Save frame control register data */
   slot.fcr[offset] = data;
@@ -431,12 +431,12 @@ void mapper_8k_w(int offset, unsigned int data)
   }
 }
     
-void mapper_16k_w(int offset, unsigned int data)
+void mapper_16k_w(int32_t offset, uint32_t  data)
 {
-  int i;
+  int32_t i;
 
   /* cartridge ROM page (16k) */
-  uint8 page = data % (cart.romsize >> 14);
+  uint8_t page = data % (cart.romsize >> 14);
   
   /* page index increment (SEGA mapper) */
   if (slot.fcr[0] & 0x03)
@@ -570,12 +570,12 @@ void mapper_16k_w(int offset, unsigned int data)
   }
 }
 
-static void write_mapper_none(unsigned int address, unsigned char data)
+static void write_mapper_none(uint32_t  address, uint8_t  data)
 {
   z80_writemap[address >> 10][address & 0x03FF] = data;
 }
 
-static void write_mapper_sega(unsigned int address, unsigned char data)
+static void write_mapper_sega(uint32_t  address, uint8_t  data)
 {
   if(address >= 0xFFFC)
   {
@@ -585,7 +585,7 @@ static void write_mapper_sega(unsigned int address, unsigned char data)
   z80_writemap[address >> 10][address & 0x03FF] = data;
 }
 
-static void write_mapper_codies(unsigned int address, unsigned char data)
+static void write_mapper_codies(uint32_t  address, uint8_t  data)
 {
   if (address == 0x0000)
   {
@@ -608,7 +608,7 @@ static void write_mapper_codies(unsigned int address, unsigned char data)
   z80_writemap[address >> 10][address & 0x03FF] = data;
 }
 
-static void write_mapper_korea(unsigned int address, unsigned char data)
+static void write_mapper_korea(uint32_t  address, uint8_t  data)
 {
   if (address == 0xA000)
   {
@@ -619,7 +619,7 @@ static void write_mapper_korea(unsigned int address, unsigned char data)
   z80_writemap[address >> 10][address & 0x03FF] = data;
 }
 
-static void write_mapper_msx(unsigned int address, unsigned char data)
+static void write_mapper_msx(uint32_t  address, uint8_t  data)
 {
   if (address <= 0x0003)
   {

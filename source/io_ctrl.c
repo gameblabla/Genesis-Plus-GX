@@ -31,21 +31,21 @@
 #include "paddle.h"
 #include "sportspad.h"
 
-uint8 io_reg[0x10];
+uint8_t io_reg[0x10];
 
-uint8 region_code = REGION_USA;
+uint8_t region_code = REGION_USA;
 
 static struct port_t
 {
-  void (*data_w)(unsigned char data, unsigned char mask);
-  unsigned char (*data_r)(void);
+  void (*data_w)(uint8_t data, uint8_t mask);
+  uint8_t (*data_r)(void);
 } port[3];
 
-static void dummy_write(unsigned char data, unsigned char mask)
+static void dummy_write(uint8_t data, uint8_t mask)
 {
 }
 
-static unsigned char dummy_read(void)
+static uint8_t dummy_read(void)
 {
   return 0x7F;
 }
@@ -266,7 +266,7 @@ void io_reset(void)
   input_reset();
 }
 
-void io_68k_write(unsigned int offset, unsigned int data)
+void io_68k_write(uint32_t offset, uint32_t data)
 {
   switch (offset)
   {
@@ -314,7 +314,7 @@ void io_68k_write(unsigned int offset, unsigned int data)
   }
 }
 
-unsigned int io_68k_read(unsigned int offset)
+uint32_t io_68k_read(uint32_t offset)
 {
   switch(offset)
   {
@@ -322,8 +322,8 @@ unsigned int io_68k_read(unsigned int offset)
     case 0x02:  /* Port B Data */
     case 0x03:  /* Port C Data */
     {
-      unsigned int mask = 0x80 | io_reg[offset + 3];
-      unsigned int data = port[offset-1].data_r();
+      uint32_t mask = 0x80 | io_reg[offset + 3];
+      uint32_t data = port[offset-1].data_r();
       return (io_reg[offset] & mask) | (data & ~mask);
     }
 
@@ -334,7 +334,7 @@ unsigned int io_68k_read(unsigned int offset)
   }
 }
 
-void io_z80_write(unsigned int data)
+void io_z80_write(uint32_t data)
 {
 /* pins can't be configured as output on japanese models */
   if (region_code & REGION_USA)
@@ -375,13 +375,13 @@ void io_z80_write(unsigned int data)
   io_reg[0] = data;
 }
 
-unsigned int io_z80_read(unsigned int offset)
+uint32_t io_z80_read(uint32_t offset)
 {
   /* Read port A & port B input data */
-  unsigned int data = (port[0].data_r()) | (port[1].data_r() << 8);
+  uint32_t data = (port[0].data_r()) | (port[1].data_r() << 8);
 
   /* Read control register value */
-  unsigned int ctrl = io_reg[0];
+  uint32_t ctrl = io_reg[0];
 
   /* I/O ports */
   if (offset)

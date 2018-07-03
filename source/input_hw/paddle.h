@@ -24,10 +24,10 @@
 #define _PADDLE_H_
 
 /* Function prototypes */
-extern void paddle_reset(int index);
-extern unsigned char paddle_1_read(void);
-extern unsigned char paddle_2_read(void);
-extern void paddle_1_write(unsigned char data, unsigned char mask);
-extern void paddle_2_write(unsigned char data, unsigned char mask);
+extern void paddle_reset(int32_t index);
+extern uint8_t paddle_1_read(void);
+extern uint8_t paddle_2_read(void);
+extern void paddle_1_write(uint8_t data, uint8_t mask);
+extern void paddle_2_write(uint8_t data, uint8_t mask);
 
 #endif

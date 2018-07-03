@@ -54,7 +54,7 @@ static double vsa = (1.0 / 4294967295.0); // Very small amount (Denormal Fix)
 //
 // Set mixfreq to whatever rate your system is using (eg 48Khz)
 
-void init_3band_state(EQSTATE * es, int lowfreq, int highfreq, int mixfreq)
+void init_3band_state(EQSTATE * es, int32_t lowfreq, int32_t highfreq, int32_t mixfreq)
 {
     // Clear state 
 
@@ -83,7 +83,7 @@ void init_3band_state(EQSTATE * es, int lowfreq, int highfreq, int mixfreq)
 // (especially the bass) so may require clipping before output, but you 
 // knew that anyway :)
 
-double do_3band(EQSTATE * es, int sample)
+double do_3band(EQSTATE * es, int32_t sample)
 {
     // Locals
 
@@ -127,5 +127,5 @@ double do_3band(EQSTATE * es, int sample)
 
     // Return result
 
-    return (int) (l + m + h);
+    return (int32_t) (l + m + h);
 }

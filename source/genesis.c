@@ -23,16 +23,16 @@
 
 #include "shared.h"
 
-uint8 tmss[4];            /* TMSS security register */
-uint8 bios_rom[0x800];    /* OS ROM   */
-uint8 work_ram[0x10000];  /* 68K RAM  */
-uint8 zram[0x2000];       /* Z80 RAM  */
-uint32 zbank;             /* Z80 bank window address */
-uint8 zstate;             /* Z80 bus state (d0 = BUSACK, d1 = /RESET) */
+uint8_t tmss[4];            /* TMSS security register */
+uint8_t bios_rom[0x800];    /* OS ROM   */
+uint8_t work_ram[0x10000];  /* 68K RAM  */
+uint8_t zram[0x2000];       /* Z80 RAM  */
+uint32_t zbank;             /* Z80 bank window address */
+uint8_t zstate;             /* Z80 bus state (d0 = BUSACK, d1 = /RESET) */
 
 /* PICO data */
-uint8 pico_current;
-uint8 pico_page[7];
+uint8_t pico_current;
+uint8_t pico_page[7];
 
 /*--------------------------------------------------------------------------*/
 /* Init, reset, shutdown functions                                          */
@@ -40,7 +40,7 @@ uint8 pico_page[7];
 
 void gen_init(void)
 {
-  int i;
+  int32_t i;
 
   /* initialize 68k */
   m68k_set_cpu_type(M68K_CPU_TYPE_68000);
@@ -157,7 +157,7 @@ void gen_init(void)
   }
 }
 
-void gen_reset(int hard_reset)
+void gen_reset(int32_t hard_reset)
 {
   /* System Reset */
   if (hard_reset)
@@ -173,7 +173,7 @@ void gen_reset(int hard_reset)
   }
 
   /* 68k & Z80 could restart anywhere in VDP frame (Bonkers, Eternal Champions, X-Men 2) */
-  mcycles_68k = mcycles_z80 = (uint32)((MCYCLES_PER_LINE * lines_per_frame) * ((double)rand() / (double)RAND_MAX));
+  mcycles_68k = mcycles_z80 = (uint32_t)((MCYCLES_PER_LINE * lines_per_frame) * ((double)rand() / (double)RAND_MAX));
 
   if (system_hw == SYSTEM_PBC)
   {
@@ -211,7 +211,7 @@ void gen_reset(int hard_reset)
         memset(tmss, 0x00, sizeof(tmss));
 
         /* VDP access is locked by default */
-        int i;
+        int32_t i;
         for (i=0xc0; i<0xe0; i+=8)
         {
           m68k_memory_map[i].read8   = m68k_lockup_r_8;
@@ -248,14 +248,14 @@ void gen_shutdown(void)
 /*  OS ROM / TMSS register control functions (Genesis mode)              */
 /*-----------------------------------------------------------------------*/
 
-void gen_tmss_w(unsigned int offset, unsigned int data)
+void gen_tmss_w(uint32_t offset, uint32_t data)
 {
   /* write TMSS regisiter */
   WRITE_WORD(tmss, offset, data);
 
   /* VDP requires "SEGA" value to be written in TMSS register */
-  int i;
-  if (strncmp((char *)tmss, "SEGA", 4) == 0)
+  int32_t i;
+  if (strncmp((int8_t *)tmss, "SEGA", 4) == 0)
   {
     for (i=0xc0; i<0xe0; i+=8)
     {
@@ -281,7 +281,7 @@ void gen_tmss_w(unsigned int offset, unsigned int data)
   }
 }
 
-void gen_bankswitch_w(unsigned int data)
+void gen_bankswitch_w(uint32_t data)
 {
   /* OS ROM has not been loaded yet */
   if (!(config.tmss & 2))
@@ -303,7 +303,7 @@ void gen_bankswitch_w(unsigned int data)
   }
 }
 
-unsigned int gen_bankswitch_r(void)
+uint32_t gen_bankswitch_r(void)
 {
   return (m68k_memory_map[0].base == cart.base);
 }
@@ -313,7 +313,7 @@ unsigned int gen_bankswitch_r(void)
 /* Z80 Bus controller chip functions (Genesis mode)                      */
 /* ----------------------------------------------------------------------*/
 
-void gen_zbusreq_w(unsigned int data, unsigned int cycles)
+void gen_zbusreq_w(uint32_t data, uint32_t cycles)
 {
   if (data)  /* !ZBUSREQ asserted */
   {
@@ -353,7 +353,7 @@ void gen_zbusreq_w(unsigned int data, unsigned int cycles)
   }
 }
 
-void gen_zreset_w(unsigned int data, unsigned int cycles)
+void gen_zreset_w(uint32_t data, uint32_t cycles)
 {
   if (data)  /* !ZRESET released */
   {
@@ -412,7 +412,7 @@ void gen_zreset_w(unsigned int data, unsigned int cycles)
   }
 }
 
-void gen_zbank_w (unsigned int data)
+void gen_zbank_w (uint32_t data)
 {
   zbank = ((zbank >> 1) | ((data & 1) << 23)) & 0xFF8000;
 }
@@ -422,7 +422,7 @@ void gen_zbank_w (unsigned int data)
 /* Z80 interrupt callback                                                */
 /* ----------------------------------------------------------------------*/
 
-int z80_irq_callback (int param)
+int32_t z80_irq_callback (int32_t param)
 {
   return 0xFF;
 }

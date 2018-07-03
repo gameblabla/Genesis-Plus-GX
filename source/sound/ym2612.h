@@ -16,15 +16,17 @@
 #ifndef _H_YM2612_
 #define _H_YM2612_
 
-extern void YM2612Init(double clock, int rate);
+#include <stdint.h>
+
+extern void YM2612Init(double clock, int32_t rate);
 extern void YM2612ResetChip(void);
-extern void YM2612Update(long int *buffer, int length);
-extern void YM2612Write(unsigned int a, unsigned int v);
-extern unsigned int YM2612Read(void);
-extern unsigned char *YM2612GetContextPtr(void);
-extern unsigned int YM2612GetContextSize(void);
-extern void YM2612Restore(unsigned char *buffer);
-extern int YM2612LoadContext(unsigned char *state);
-extern int YM2612SaveContext(unsigned char *state);
+extern void YM2612Update(int32_t *buffer, int32_t length);
+extern void YM2612Write(uint32_t a, uint32_t v);
+extern uint32_t YM2612Read(void);
+extern uint8_t *YM2612GetContextPtr(void);
+extern uint32_t YM2612GetContextSize(void);
+extern void YM2612Restore(uint8_t *buffer);
+extern int32_t YM2612LoadContext(uint8_t *state);
+extern int32_t YM2612SaveContext(uint8_t *state);
 
 #endif /* _YM2612_ */

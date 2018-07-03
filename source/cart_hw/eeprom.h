@@ -53,29 +53,29 @@ typedef enum
 
 typedef struct
 {
-  uint8 address_bits;     /* number of bits needed to address memory: 7, 8 or 16 */
-  uint16 size_mask;       /* depends on the max size of the memory (in bytes) */
-  uint16 pagewrite_mask;  /* depends on the maximal number of bytes that can be written in a single write cycle */
-  uint32 sda_in_adr;      /* 68000 memory address mapped to SDA_IN */
-  uint32 sda_out_adr;     /* 68000 memory address mapped to SDA_OUT */
-  uint32 scl_adr;         /* 68000 memory address mapped to SCL */
-  uint8 sda_in_bit;       /* bit offset for SDA_IN */
-  uint8 sda_out_bit;      /* bit offset for SDA_OUT */
-  uint8 scl_bit;          /* bit offset for SCL */
+  uint8_t address_bits;     /* number of bits needed to address memory: 7, 8 or 16 */
+  uint16_t size_mask;       /* depends on the max size of the memory (in bytes) */
+  uint16_t pagewrite_mask;  /* depends on the maximal number of bytes that can be written in a single write cycle */
+  uint32_t sda_in_adr;      /* 68000 memory address mapped to SDA_IN */
+  uint32_t sda_out_adr;     /* 68000 memory address mapped to SDA_OUT */
+  uint32_t scl_adr;         /* 68000 memory address mapped to SCL */
+  uint8_t sda_in_bit;       /* bit offset for SDA_IN */
+  uint8_t sda_out_bit;      /* bit offset for SDA_OUT */
+  uint8_t scl_bit;          /* bit offset for SCL */
 
 } T_EEPROM_TYPE;
 
 
 typedef struct
 {
-  uint8 sda;            /* current /SDA line state */
-  uint8 scl;            /* current /SCL line state */
-  uint8 old_sda;        /* previous /SDA line state */
-  uint8 old_scl;        /* previous /SCL line state */
-  uint8 cycles;         /* current operation cycle number (0-9) */
-  uint8 rw;             /* operation type (1:READ, 0:WRITE) */
-  uint16 slave_mask;    /* device address (shifted by the memory address width)*/
-  uint16 word_address;  /* memory address */
+  uint8_t sda;            /* current /SDA line state */
+  uint8_t scl;            /* current /SCL line state */
+  uint8_t old_sda;        /* previous /SDA line state */
+  uint8_t old_scl;        /* previous /SCL line state */
+  uint8_t cycles;         /* current operation cycle number (0-9) */
+  uint8_t rw;             /* operation type (1:READ, 0:WRITE) */
+  uint16_t slave_mask;    /* device address (shifted by the memory address width)*/
+  uint16_t word_address;  /* memory address */
   T_EEPROM_STATE state; /* current operation state */
   T_EEPROM_TYPE type;   /* EEPROM characteristics for this game */
 
@@ -86,7 +86,7 @@ extern T_EEPROM eeprom;
 
 /* Function prototypes */
 extern void eeprom_init();
-extern void eeprom_write(unsigned int address, unsigned int data, int word_access);
-extern unsigned int eeprom_read(int word_access);
+extern void eeprom_write(uint32_t address, uint32_t data, int32_t word_access);
+extern uint32_t eeprom_read(int32_t word_access);
 
 #endif

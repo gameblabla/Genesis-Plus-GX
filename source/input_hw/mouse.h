@@ -24,8 +24,8 @@
 #define _MOUSE_H_
 
 /* Function prototypes */
-extern void mouse_reset(int port);
-extern unsigned char mouse_read(void);
-extern void mouse_write(unsigned char data, unsigned char mask);
+extern void mouse_reset(int32_t port);
+extern uint8_t mouse_read(void);
+extern void mouse_write(uint8_t data, uint8_t mask);
 
 #endif

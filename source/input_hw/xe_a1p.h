@@ -25,7 +25,7 @@
 
 /* Function prototypes */
 extern void xe_a1p_reset(void);
-extern unsigned char xe_a1p_read(void);
-extern void xe_a1p_write(unsigned char data, unsigned char mask);
+extern uint8_t xe_a1p_read(void);
+extern void xe_a1p_write(uint8_t data, uint8_t mask);
 
 #endif

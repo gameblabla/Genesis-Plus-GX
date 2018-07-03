@@ -29,7 +29,7 @@ typedef struct md_ntsc_setup_t
   double bleed;      /* color bleed (color resolution reduction) */
   float const* decoder_matrix; /* optional RGB decoder matrix, 6 elements */
 
-  unsigned char* palette_out;  /* optional RGB palette out, 3 bytes per color */
+  uint8_t* palette_out;  /* optional RGB palette out, 3 bytes per color */
 } md_ntsc_setup_t;
 
 /* Video format presets */
@@ -49,8 +49,8 @@ void md_ntsc_init( md_ntsc_t* ntsc, md_ntsc_setup_t const* setup );
 and output RGB depth is set by MD_NTSC_OUT_DEPTH. Both default to 16-bit RGB.
 In_row_width is the number of pixels to get to the next input row. Out_pitch
 is the number of *bytes* to get to the next output row. */
-void md_ntsc_blit( md_ntsc_t const* ntsc, MD_NTSC_IN_T const* table, unsigned char* input,
-    int in_width, int vline);
+void md_ntsc_blit( md_ntsc_t const* ntsc, MD_NTSC_IN_T const* table, uint8_t* input,
+    int32_t in_width, int32_t vline);
 
 /* Number of output pixels written by blitter for given input width. */
 #define MD_NTSC_OUT_WIDTH( in_width ) \
@@ -106,7 +106,7 @@ statement in a block (unless you're using C++). */
 
 /* private */
 enum { md_ntsc_entry_size = 2 * 16 };
-typedef unsigned long md_ntsc_rgb_t;
+typedef uint32_t md_ntsc_rgb_t;
 struct md_ntsc_t {
   md_ntsc_rgb_t table [md_ntsc_palette_size] [md_ntsc_entry_size];
 };

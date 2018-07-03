@@ -23,13 +23,13 @@
 #ifndef _MEMZ80_H_
 #define _MEMZ80_H_
 
-extern unsigned char z80_md_memory_r(unsigned int address);
-extern void z80_md_memory_w(unsigned int address, unsigned char data);
-extern unsigned char z80_sms_memory_r(unsigned int address);
+extern uint8_t  z80_md_memory_r(uint32_t  address);
+extern void z80_md_memory_w(uint32_t  address, uint8_t  data);
+extern uint8_t  z80_sms_memory_r(uint32_t  address);
 
-extern unsigned char z80_unused_port_r(unsigned int port);
-extern void z80_unused_port_w(unsigned int port, unsigned char data);
-extern unsigned char z80_sms_port_r(unsigned int port);
-extern void z80_sms_port_w(unsigned int port, unsigned char data);
+extern uint8_t  z80_unused_port_r(uint32_t  port);
+extern void z80_unused_port_w(uint32_t  port, uint8_t  data);
+extern uint8_t  z80_sms_port_r(uint32_t  port);
+extern void z80_sms_port_w(uint32_t  port, uint8_t  data);
 
 #endif /* _MEMZ80_H_ */

@@ -1,0 +1,12 @@
+*.md
+*.srm
+*.elf
+core
+*.o
+*.smd
+*.bin
+*.log
+*.bin
+*.32x
+*.iso
+*.cue

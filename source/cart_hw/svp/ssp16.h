@@ -32,14 +32,14 @@ enum {
 
 typedef union
 {
-  unsigned int v;
+  uint32_t  v;
   struct {
 #ifdef LSB_FIRST
-  unsigned short l;
-  unsigned short h;
+  uint16_t l;
+  uint16_t h;
 #else
-  unsigned short h;
-  unsigned short l;
+  uint16_t h;
+  uint16_t l;
 #endif
   };
 } ssp_reg_t;
@@ -47,23 +47,23 @@ typedef union
 typedef struct
 {
   union {
-    unsigned short RAM[256*2];  // 2 internal RAM banks
+    uint16_t RAM[256*2];  // 2 internal RAM banks
     struct {
-      unsigned short RAM0[256];
-      unsigned short RAM1[256];
+      uint16_t RAM0[256];
+      uint16_t RAM1[256];
     };
   };
   ssp_reg_t gr[16];  // general registers
   union {
-    unsigned char r[8];  // BANK pointers
+    uint8_t r[8];  // BANK pointers
     struct {
-      unsigned char r0[4];
-      unsigned char r1[4];
+      uint8_t r0[4];
+      uint8_t r1[4];
     };
   };
-  unsigned short stack[6];
-  unsigned int pmac_read[6];  // read modes/addrs for PM0-PM5
-  unsigned int pmac_write[6]; // write ...
+  uint16_t stack[6];
+  uint32_t  pmac_read[6];  // read modes/addrs for PM0-PM5
+  uint32_t  pmac_write[6]; // write ...
 
   #define SSP_PMC_HAVE_ADDR  0x0001 // address written to PMAC, waiting for mode
   #define SSP_PMC_SET      0x0002   // PMAC is set
@@ -72,12 +72,12 @@ typedef struct
   #define SSP_WAIT_30FE06    0x4000 // ssp tight loops on 30FE08 to become non-zero
   #define SSP_WAIT_30FE08    0x8000 // same for 30FE06
   #define SSP_WAIT_MASK    0xf000
-  unsigned int emu_status;
-  unsigned int pad[30];
+  uint32_t  emu_status;
+  uint32_t  pad[30];
 } ssp1601_t;
 
 
 void ssp1601_reset(ssp1601_t *ssp);
-void ssp1601_run(int cycles);
+void ssp1601_run(int32_t cycles);
 
 #endif

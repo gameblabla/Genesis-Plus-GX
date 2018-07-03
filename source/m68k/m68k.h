@@ -153,6 +153,15 @@ unsigned int  m68k_read_memory_8(unsigned int address);
 unsigned int  m68k_read_memory_16(unsigned int address);
 unsigned int  m68k_read_memory_32(unsigned int address);
 
+/* Read data immediately following the PC */
+unsigned int  m68k_read_immediate_16(unsigned int address);
+unsigned int  m68k_read_immediate_32(unsigned int address);
+
+/* Read data relative to the PC */
+unsigned int  m68k_read_pcrelative_8(unsigned int address);
+unsigned int  m68k_read_pcrelative_16(unsigned int address);
+unsigned int  m68k_read_pcrelative_32(unsigned int address);
+
 /* Memory access for the disassembler */
 unsigned int m68k_read_disassembler_8  (unsigned int address);
 unsigned int m68k_read_disassembler_16 (unsigned int address);

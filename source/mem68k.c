@@ -28,7 +28,7 @@
 /*--------------------------------------------------------------------------*/
 /* Unused area (return open bus data, i.e prefetched instruction word)      */
 /*--------------------------------------------------------------------------*/
-unsigned int m68k_read_bus_8(unsigned int address)
+uint32_t  m68k_read_bus_8(uint32_t  address)
 {
 #ifdef LOGERROR
   error("Unused read8 %08X (%08X)\n", address, m68k_get_reg (NULL, M68K_REG_PC));
@@ -36,7 +36,7 @@ unsigned int m68k_read_bus_8(unsigned int address)
   return m68k_read_pcrelative_8(REG_PC | (address & 1));
 }
 
-unsigned int m68k_read_bus_16(unsigned int address)
+uint32_t  m68k_read_bus_16(uint32_t  address)
 {
 #ifdef LOGERROR
   error("Unused read16 %08X (%08X)\n", address, m68k_get_reg (NULL, M68K_REG_PC));
@@ -45,14 +45,14 @@ unsigned int m68k_read_bus_16(unsigned int address)
 }
 
 
-void m68k_unused_8_w (unsigned int address, unsigned int data)
+void m68k_unused_8_w (uint32_t  address, uint32_t  data)
 {
 #ifdef LOGERROR
   error("Unused write8 %08X = %02X (%08X)\n", address, data, m68k_get_reg (NULL, M68K_REG_PC));
 #endif
 }
 
-void m68k_unused_16_w (unsigned int address, unsigned int data)
+void m68k_unused_16_w (uint32_t  address, uint32_t  data)
 {
 #ifdef LOGERROR
   error("Unused write16 %08X = %04X (%08X)\n", address, data, m68k_get_reg (NULL, M68K_REG_PC));
@@ -63,7 +63,7 @@ void m68k_unused_16_w (unsigned int address, unsigned int data)
 /*--------------------------------------------------------------------------*/
 /* Illegal area (cause system to lock-up since !DTACK is not returned)      */
 /*--------------------------------------------------------------------------*/
-void m68k_lockup_w_8 (unsigned int address, unsigned int data)
+void m68k_lockup_w_8 (uint32_t  address, uint32_t  data)
 {
 #ifdef LOGERROR
   error ("Lockup %08X = %02X (%08X)\n", address, data, m68k_get_reg (NULL, M68K_REG_PC));
@@ -74,7 +74,7 @@ void m68k_lockup_w_8 (unsigned int address, unsigned int data)
   }
 }
 
-void m68k_lockup_w_16 (unsigned int address, unsigned int data)
+void m68k_lockup_w_16 (uint32_t  address, uint32_t  data)
 {
 #ifdef LOGERROR
   error ("Lockup %08X = %04X (%08X)\n", address, data, m68k_get_reg (NULL, M68K_REG_PC));
@@ -85,7 +85,7 @@ void m68k_lockup_w_16 (unsigned int address, unsigned int data)
   }
 }
 
-unsigned int m68k_lockup_r_8 (unsigned int address)
+uint32_t  m68k_lockup_r_8 (uint32_t  address)
 { 
 #ifdef LOGERROR
   error ("Lockup %08X.b (%08X)\n", address, m68k_get_reg (NULL, M68K_REG_PC));
@@ -97,7 +97,7 @@ unsigned int m68k_lockup_r_8 (unsigned int address)
   return m68k_read_pcrelative_8(REG_PC | (address & 1));
 }
 
-unsigned int m68k_lockup_r_16 (unsigned int address)
+uint32_t  m68k_lockup_r_16 (uint32_t  address)
 {
 #ifdef LOGERROR
   error ("Lockup %08X.w (%08X)\n", address, m68k_get_reg (NULL, M68K_REG_PC));
@@ -113,7 +113,7 @@ unsigned int m68k_lockup_r_16 (unsigned int address)
 /*--------------------------------------------------------------------------*/
 /* cartridge EEPROM                                                         */
 /*--------------------------------------------------------------------------*/
-unsigned int eeprom_read_byte(unsigned int address)
+uint32_t  eeprom_read_byte(uint32_t  address)
 {
   if (address == eeprom.type.sda_out_adr)
   {
@@ -122,7 +122,7 @@ unsigned int eeprom_read_byte(unsigned int address)
   return READ_BYTE(cart.rom, address);
 }
 
-unsigned int eeprom_read_word(unsigned int address)
+uint32_t  eeprom_read_word(uint32_t  address)
 {
   if (address == (eeprom.type.sda_out_adr & 0xFFFFFE))
   {
@@ -131,7 +131,7 @@ unsigned int eeprom_read_word(unsigned int address)
   return *(uint16 *)(cart.rom + address);
 }
 
-void eeprom_write_byte(unsigned int address, unsigned int data)
+void eeprom_write_byte(uint32_t  address, uint32_t  data)
 {
   if ((address == eeprom.type.sda_in_adr) || (address == eeprom.type.scl_adr))
   {
@@ -141,7 +141,7 @@ void eeprom_write_byte(unsigned int address, unsigned int data)
   m68k_unused_8_w(address, data);
 }
 
-void eeprom_write_word(unsigned int address, unsigned int data)
+void eeprom_write_word(uint32_t  address, uint32_t  data)
 {
   if ((address == (eeprom.type.sda_in_adr & 0xFFFFFE)) || (address == (eeprom.type.scl_adr & 0xFFFFFE)))
   {
@@ -155,7 +155,7 @@ void eeprom_write_word(unsigned int address, unsigned int data)
 /*--------------------------------------------------------------------------*/
 /* Z80 bus (accessed through I/O chip)                                      */
 /*--------------------------------------------------------------------------*/
-unsigned int z80_read_byte(unsigned int address)
+uint32_t  z80_read_byte(uint32_t  address)
 {
   switch ((address >> 13) & 3)
   {
@@ -181,13 +181,13 @@ unsigned int z80_read_byte(unsigned int address)
   }
 }
 
-unsigned int z80_read_word(unsigned int address)
+uint32_t  z80_read_word(uint32_t  address)
 {
-  unsigned int data = z80_read_byte(address);
+  uint32_t  data = z80_read_byte(address);
   return (data | (data << 8));
 }
 
-void z80_write_byte(unsigned int address, unsigned int data)
+void z80_write_byte(uint32_t  address, uint32_t  data)
 {
   switch ((address >> 13) & 3)
   {
@@ -230,7 +230,7 @@ void z80_write_byte(unsigned int address, unsigned int data)
   }
 }
 
-void z80_write_word(unsigned int address, unsigned int data)
+void z80_write_word(uint32_t  address, uint32_t  data)
 {
   z80_write_byte(address, data >> 8);
 }
@@ -239,7 +239,7 @@ void z80_write_word(unsigned int address, unsigned int data)
 /*--------------------------------------------------------------------------*/
 /* I/O Control                                                              */
 /*--------------------------------------------------------------------------*/
-unsigned int ctrl_io_read_byte(unsigned int address)
+uint32_t  ctrl_io_read_byte(uint32_t  address)
 {
   switch ((address >> 8) & 0xFF)
   {
@@ -256,7 +256,7 @@ unsigned int ctrl_io_read_byte(unsigned int address)
     {
       if (!(address & 1))
       {
-        unsigned int data = m68k_read_pcrelative_8(REG_PC) & 0xFE;
+        uint32_t  data = m68k_read_pcrelative_8(REG_PC) & 0xFE;
         if (zstate == 3)
         {
           return data;
@@ -270,7 +270,7 @@ unsigned int ctrl_io_read_byte(unsigned int address)
     {
       if (cart.hw.time_r)
       {
-        unsigned int data = cart.hw.time_r(address);
+        uint32_t  data = cart.hw.time_r(address);
         if (address & 1)
         {
           return (data & 0xFF);
@@ -284,7 +284,7 @@ unsigned int ctrl_io_read_byte(unsigned int address)
     {
       if (address & 1)
       {
-        unsigned int data = m68k_read_pcrelative_8(REG_PC) & 0xFE;
+        uint32_t  data = m68k_read_pcrelative_8(REG_PC) & 0xFE;
         return (gen_bankswitch_r() | data);
       }
       return m68k_read_bus_8(address);
@@ -307,7 +307,7 @@ unsigned int ctrl_io_read_byte(unsigned int address)
   }
 }
 
-unsigned int ctrl_io_read_word(unsigned int address)
+uint32_t  ctrl_io_read_word(uint32_t  address)
 {
   switch ((address >> 8) & 0xFF)
   {
@@ -315,7 +315,7 @@ unsigned int ctrl_io_read_word(unsigned int address)
     {
       if (!(address & 0xE0))
       {
-        unsigned int data = io_68k_read((address >> 1) & 0x0F);
+        uint32_t  data = io_68k_read((address >> 1) & 0x0F);
         return (data << 8 | data);
       }
       return m68k_read_bus_16(address); 
@@ -323,7 +323,7 @@ unsigned int ctrl_io_read_word(unsigned int address)
 
     case 0x11:  /* BUSACK */
     {
-      unsigned int data = m68k_read_pcrelative_16(REG_PC) & 0xFEFF;
+      uint32_t  data = m68k_read_pcrelative_16(REG_PC) & 0xFEFF;
       if (zstate == 3)
       {
         return data;
@@ -349,7 +349,7 @@ unsigned int ctrl_io_read_word(unsigned int address)
 
       if ((address & 0xFF) == 4)
       {
-        unsigned int data = svp->ssp1601.gr[SSP_PM0].h;
+        uint32_t  data = svp->ssp1601.gr[SSP_PM0].h;
         svp->ssp1601.gr[SSP_PM0].h &= ~1;
         return data;
       }
@@ -374,7 +374,7 @@ unsigned int ctrl_io_read_word(unsigned int address)
   }
 }
 
-void ctrl_io_write_byte(unsigned int address, unsigned int data)
+void ctrl_io_write_byte(uint32_t  address, uint32_t  data)
 {
   switch ((address >> 8) & 0xFF)
   {
@@ -447,7 +447,7 @@ void ctrl_io_write_byte(unsigned int address, unsigned int data)
   }
 }
 
-void ctrl_io_write_word(unsigned int address, unsigned int data)
+void ctrl_io_write_word(uint32_t  address, uint32_t  data)
 {
   switch ((address >> 8) & 0xFF)
   {
@@ -525,7 +525,7 @@ void ctrl_io_write_word(unsigned int address, unsigned int data)
 /*--------------------------------------------------------------------------*/
 /* VDP                                                                      */
 /*--------------------------------------------------------------------------*/
-unsigned int vdp_read_byte(unsigned int address)
+uint32_t  vdp_read_byte(uint32_t  address)
 {
   switch (address & 0xFD)
   {
@@ -576,7 +576,7 @@ unsigned int vdp_read_byte(unsigned int address)
   }
 }
 
-unsigned int vdp_read_word(unsigned int address)
+uint32_t  vdp_read_word(uint32_t  address)
 {
   switch (address & 0xFC)
   {
@@ -609,7 +609,7 @@ unsigned int vdp_read_word(unsigned int address)
   }
 }
 
-void vdp_write_byte(unsigned int address, unsigned int data)
+void vdp_write_byte(uint32_t  address, uint32_t  data)
 {
   switch (address & 0xFC)
   {
@@ -657,7 +657,7 @@ void vdp_write_byte(unsigned int address, unsigned int data)
   }
 }
 
-void vdp_write_word(unsigned int address, unsigned int data)
+void vdp_write_word(uint32_t  address, uint32_t  data)
 {
   switch (address & 0xFC)
   {
@@ -703,7 +703,7 @@ void vdp_write_word(unsigned int address, unsigned int data)
 
 /******* PICO ************************************************/
 
-unsigned int pico_read_byte(unsigned int address)
+uint32_t  pico_read_byte(uint32_t  address)
 {
   /* PICO */
   switch (address & 0xFF)
@@ -715,7 +715,7 @@ unsigned int pico_read_byte(unsigned int address)
 
     case 0x03:  /* IO register */
     {
-      unsigned int retval = 0xFF;
+      uint32_t  retval = 0xFF;
       if (input.pad[0] & INPUT_B)     retval &= ~0x10;
       if (input.pad[0] & INPUT_A)     retval &= ~0x80;
       if (input.pad[0] & INPUT_UP)    retval &= ~0x01;
@@ -764,7 +764,7 @@ unsigned int pico_read_byte(unsigned int address)
   }
 }
 
-unsigned int pico_read_word(unsigned int address)
+uint32_t  pico_read_word(uint32_t  address)
 {
   return (pico_read_byte(address | 1) | (m68k_read_bus_8(address) << 8));
 }

@@ -29,7 +29,7 @@ typedef struct sms_ntsc_setup_t
   double bleed;      /* color bleed (color resolution reduction) */
   float const* decoder_matrix; /* optional RGB decoder matrix, 6 elements */
   
-  unsigned char* palette_out;  /* optional RGB palette out, 3 bytes per color */
+  uint8_t* palette_out;  /* optional RGB palette out, 3 bytes per color */
 } sms_ntsc_setup_t;
 
 /* Video format presets */
@@ -49,7 +49,7 @@ void sms_ntsc_init( sms_ntsc_t* ntsc, sms_ntsc_setup_t const* setup );
 and output RGB depth is set by SMS_NTSC_OUT_DEPTH. Both default to 16-bit RGB.
 In_row_width is the number of pixels to get to the next input row. Out_pitch
 is the number of *bytes* to get to the next output row. */
-void sms_ntsc_blit( sms_ntsc_t const* ntsc, SMS_NTSC_IN_T const* table, unsigned char* input,
+void sms_ntsc_blit( sms_ntsc_t const* ntsc, SMS_NTSC_IN_T const* table, uint8_t* input,
     int in_width, int vline);
 
 /* Number of output pixels written by blitter for given input width. */
@@ -90,7 +90,7 @@ statement in a block (unless you're using C++). */
 
 /* private */
 enum { sms_ntsc_entry_size = 3 * 14 };
-typedef unsigned long sms_ntsc_rgb_t;
+typedef uint32_t sms_ntsc_rgb_t;
 struct sms_ntsc_t {
   sms_ntsc_rgb_t table [sms_ntsc_palette_size] [sms_ntsc_entry_size];
 };

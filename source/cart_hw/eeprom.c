@@ -28,7 +28,7 @@ T_EEPROM eeprom;
 typedef struct
 {
   char game_id[16];
-  uint16 chk;
+  uint16_t chk;
   T_EEPROM_TYPE type;
 } T_GAME_ENTRY;
 
@@ -83,7 +83,7 @@ static const T_GAME_ENTRY database[GAME_CNT] =
 
 void eeprom_init()
 {
-  int i = 0;
+  int32_t i = 0;
 
   /* initialize eeprom */
   memset(&eeprom, 0, sizeof(T_EEPROM));
@@ -152,7 +152,7 @@ static inline void Detect_STOP()
   }
 }
 
-void eeprom_write(unsigned int address, unsigned int data, int word_access)
+void eeprom_write(uint32_t address, uint32_t data, int32_t word_access)
 {
   /* decode SCL and SDA value */
   if (word_access)
@@ -394,7 +394,7 @@ void eeprom_write(unsigned int address, unsigned int data, int word_access)
         if (eeprom.cycles < 9)
         {
           /* Write DATA bits (max 64kBytes) */
-          uint16 sram_address = (eeprom.slave_mask | eeprom.word_address) & 0xFFFF;
+          uint16_t sram_address = (eeprom.slave_mask | eeprom.word_address) & 0xFFFF;
           if (eeprom.old_sda) sram.sram[sram_address] |= (1 << (8 - eeprom.cycles));
           else sram.sram[sram_address] &= ~(1 << (8 - eeprom.cycles));
 
@@ -416,9 +416,9 @@ void eeprom_write(unsigned int address, unsigned int data, int word_access)
   eeprom.old_sda = eeprom.sda;
 }
 
-unsigned int eeprom_read(int word_access)
+uint32_t eeprom_read(int32_t word_access)
 {
-  uint8 sda_out = eeprom.sda;
+  uint8_t sda_out = eeprom.sda;
 
   /* EEPROM state */
   switch (eeprom.state)
@@ -427,7 +427,7 @@ unsigned int eeprom_read(int word_access)
       if (eeprom.cycles < 9)
       {
         /* Return DATA bits (max 64kBytes) */
-        uint16 sram_address = (eeprom.slave_mask | eeprom.word_address) & 0xffff;
+        uint16_t sram_address = (eeprom.slave_mask | eeprom.word_address) & 0xffff;
         sda_out = (sram.sram[sram_address] >> (8 - eeprom.cycles)) & 1;
 
         if (eeprom.cycles == 8)

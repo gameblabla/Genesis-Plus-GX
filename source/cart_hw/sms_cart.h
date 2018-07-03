@@ -28,10 +28,10 @@
 /* Function prototypes */
 extern void sms_cart_init(void);
 extern void sms_cart_reset(void);
-extern void sms_cart_switch(int enabled);
-extern int sms_cart_region_detect(void);
-extern int sms_cart_context_save(uint8 *state);
-extern int sms_cart_context_load(uint8 *state);
+extern void sms_cart_switch(int32_t enabled);
+extern int32_t sms_cart_region_detect(void);
+extern int32_t sms_cart_context_save(uint8_t *state);
+extern int32_t sms_cart_context_load(uint8_t *state);
 
 #endif
 

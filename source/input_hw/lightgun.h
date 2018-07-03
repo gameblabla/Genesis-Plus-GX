@@ -24,12 +24,12 @@
 #define _LIGHTGUN_H_
 
 /* Input devices port handlers */
-extern void lightgun_reset(int index);
-extern void lightgun_refresh(int port);
-extern unsigned char phaser_1_read(void);
-extern unsigned char phaser_2_read(void);
-extern unsigned char menacer_read(void);
-extern unsigned char justifier_read(void);
-extern void justifier_write(unsigned char data, unsigned char mask);
+extern void lightgun_reset(int32_t index);
+extern void lightgun_refresh(int32_t port);
+extern uint8_t phaser_1_read(void);
+extern uint8_t phaser_2_read(void);
+extern uint8_t menacer_read(void);
+extern uint8_t justifier_read(void);
+extern void justifier_write(uint8_t data, uint8_t mask);
 
 #endif

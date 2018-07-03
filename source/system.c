@@ -28,23 +28,23 @@
 /* Global variables */
 t_bitmap bitmap;
 t_snd snd;
-uint32 mcycles_vdp;
-uint32 mcycles_z80;
-uint32 mcycles_68k;
-uint8 system_hw;
-void (*system_frame)(int do_skip);
+uint32_t mcycles_vdp;
+uint32_t mcycles_z80;
+uint32_t mcycles_68k;
+uint8_t system_hw;
+void (*system_frame)(int32_t do_skip);
 
-static void system_frame_md(int do_skip);
-static void system_frame_sms(int do_skip);
-static int pause_b;
+static void system_frame_md(int32_t do_skip);
+static void system_frame_sms(int32_t do_skip);
+static int32_t pause_b;
 static EQSTATE eq;
-static int32 llp,rrp;
+static int32_t llp,rrp;
 
 /****************************************************************
  * Audio subsystem
  ****************************************************************/
 
-int audio_init (int samplerate, float framerate)
+int32_t audio_init (int32_t samplerate, float framerate)
 {
   /* Shutdown first */
   audio_shutdown();
@@ -57,20 +57,20 @@ int audio_init (int samplerate, float framerate)
   snd.frame_rate  = framerate;
 
   /* Calculate the sound buffer size (for one frame) */
-  snd.buffer_size = (int)(samplerate / framerate) + 32;
+  snd.buffer_size = (int32_t)(samplerate / framerate) + 32;
 
   /* SN76489 stream buffers */
-  snd.psg.buffer = (int16 *) malloc(snd.buffer_size * sizeof(int16));
+  snd.psg.buffer = (int16_t *) malloc(snd.buffer_size * sizeof(int16_t));
   if (!snd.psg.buffer) return (-1);
 
   /* YM2612 stream buffers */
-  snd.fm.buffer = (int32 *) malloc(snd.buffer_size * sizeof(int32) * 2);
+  snd.fm.buffer = (int32_t *) malloc(snd.buffer_size * sizeof(int32_t) * 2);
   if (!snd.fm.buffer) return (-1);
 
 #ifndef NGC
   /* Output buffers */
-  snd.buffer[0] = (int16 *) malloc(snd.buffer_size * sizeof(int16));
-  snd.buffer[1] = (int16 *) malloc(snd.buffer_size * sizeof(int16));
+  snd.buffer[0] = (int16_t *) malloc(snd.buffer_size * sizeof(int16_t));
+  snd.buffer[1] = (int16_t *) malloc(snd.buffer_size * sizeof(int16_t));
   if (!snd.buffer[0] || !snd.buffer[1]) return (-1);
 #endif
 
@@ -101,11 +101,11 @@ void audio_reset(void)
   /* Audio buffers */
   snd.psg.pos = snd.psg.buffer;
   snd.fm.pos  = snd.fm.buffer;
-  if (snd.psg.buffer) memset (snd.psg.buffer, 0, snd.buffer_size * sizeof(int16));
-  if (snd.fm.buffer) memset (snd.fm.buffer, 0, snd.buffer_size * sizeof(int32) * 2);
+  if (snd.psg.buffer) memset (snd.psg.buffer, 0, snd.buffer_size * sizeof(int16_t));
+  if (snd.fm.buffer) memset (snd.fm.buffer, 0, snd.buffer_size * sizeof(int32_t) * 2);
 #ifndef NGC
-  if (snd.buffer[0]) memset (snd.buffer[0], 0, snd.buffer_size * sizeof(int16));
-  if (snd.buffer[1]) memset (snd.buffer[1], 0, snd.buffer_size * sizeof(int16));
+  if (snd.buffer[0]) memset (snd.buffer[0], 0, snd.buffer_size * sizeof(int16_t));
+  if (snd.buffer[1]) memset (snd.buffer[1], 0, snd.buffer_size * sizeof(int16_t));
 #endif
 }
 
@@ -131,27 +131,27 @@ void audio_shutdown(void)
   Fir_Resampler_shutdown();
 }
 
-int audio_update (void)
+int32_t audio_update (void)
 {
-  int32 i, l, r;
-  int32 ll = llp;
-  int32 rr = rrp;
+  int32_t i, l, r;
+  int32_t ll = llp;
+  int32_t rr = rrp;
 
-  int psg_preamp  = config.psg_preamp;
-  int fm_preamp   = config.fm_preamp;
-  int filter      = config.filter;
-  uint32 factora  = (config.lp_range << 16) / 100;
-  uint32 factorb  = 0x10000 - factora;
+  int32_t psg_preamp  = config.psg_preamp;
+  int32_t fm_preamp   = config.fm_preamp;
+  int32_t filter      = config.filter;
+  uint32_t factora  = (config.lp_range << 16) / 100;
+  uint32_t factorb  = 0x10000 - factora;
 
-  int32 *fm       = snd.fm.buffer;
-  int16 *psg      = snd.psg.buffer;
+  int32_t *fm       = snd.fm.buffer;
+  int16_t *psg      = snd.psg.buffer;
 
 #ifdef NGC
-  int16 *sb = (int16 *) soundbuffer[mixbuffer];
+  int16_t *sb = (int16_t *) soundbuffer[mixbuffer];
 #endif
 
   /* get number of available samples */
-  int size = sound_update(mcycles_vdp);
+  int32_t size = sound_update(mcycles_vdp);
 
   /* return an aligned number of samples */
   size &= ~7;
@@ -271,16 +271,16 @@ void system_shutdown (void)
   SN76489_Shutdown();
 }
 
-static void system_frame_md(int do_skip)
+static void system_frame_md(int32_t do_skip)
 {
   /* line counter */
-  int line = 0;
+  int32_t line = 0;
 
   /* Z80 interrupt flag */
-  int zirq = 1;
+  int32_t zirq = 1;
 
   /* reload H Counter */
-  int h_counter = reg[10];
+  int32_t h_counter = reg[10];
 
   /* reset line master cycle count */
   mcycles_vdp = 0;
@@ -301,7 +301,7 @@ static void system_frame_md(int do_skip)
     bitmap.viewport.changed &= ~2;
 
     /* interlaced mode */
-    int old_interlaced  = interlaced;
+    int32_t old_interlaced  = interlaced;
     interlaced = (reg[12] & 0x02) >> 1;
     if (old_interlaced != interlaced)
     {
@@ -456,8 +456,8 @@ static void system_frame_md(int do_skip)
   status |= 0x08;
 
   /* overscan area */
-  int start = lines_per_frame - bitmap.viewport.y;
-  int end   = bitmap.viewport.h + bitmap.viewport.y;
+  int32_t start = lines_per_frame - bitmap.viewport.y;
+  int32_t end   = bitmap.viewport.h + bitmap.viewport.y;
 
   /* check viewport changes */
   if ((bitmap.viewport.w != bitmap.viewport.ow) || (bitmap.viewport.h != bitmap.viewport.oh))
@@ -608,13 +608,13 @@ static void system_frame_md(int do_skip)
 }
 
 
-static void system_frame_sms(int do_skip)
+static void system_frame_sms(int32_t do_skip)
 {
   /* line counter */
-  int line = 0;
+  int32_t line = 0;
 
   /* reload H Counter */
-  int h_counter = reg[10];
+  int32_t h_counter = reg[10];
 
   /* reset line master cycle count */
   mcycles_vdp = 0;
@@ -635,7 +635,7 @@ static void system_frame_sms(int do_skip)
     bitmap.viewport.changed &= ~2;
 
     /* interlaced mode */
-    int old_interlaced  = interlaced;
+    int32_t old_interlaced  = interlaced;
     interlaced = (reg[12] & 0x02) >> 1;
     if (old_interlaced != interlaced)
     {
@@ -796,8 +796,8 @@ static void system_frame_sms(int do_skip)
   status |= 0x08;
 
   /* overscan area */
-  int start = lines_per_frame - bitmap.viewport.y;
-  int end   = bitmap.viewport.h + bitmap.viewport.y;
+  int32_t start = lines_per_frame - bitmap.viewport.y;
+  int32_t end   = bitmap.viewport.h + bitmap.viewport.y;
 
   /* check viewport changes */
   if ((bitmap.viewport.w != bitmap.viewport.ow) || (bitmap.viewport.h != bitmap.viewport.oh))

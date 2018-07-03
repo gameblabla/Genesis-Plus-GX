@@ -26,9 +26,9 @@
 /* Function prototypes */
 extern void teamplayer_init(int port);
 extern void teamplayer_reset(int port);
-extern unsigned char teamplayer_1_read(void);
-extern unsigned char teamplayer_2_read(void);
-extern void teamplayer_1_write(unsigned char data, unsigned char mask);
-extern void teamplayer_2_write(unsigned char data, unsigned char mask);
+extern uint8_t teamplayer_1_read(void);
+extern uint8_t teamplayer_2_read(void);
+extern void teamplayer_1_write(uint8_t data, uint8_t mask);
+extern void teamplayer_2_write(uint8_t data, uint8_t mask);
 
 #endif

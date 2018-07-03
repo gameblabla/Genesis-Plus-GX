@@ -51,24 +51,24 @@
 typedef struct
 {
   /* Configuration */
-  int BoostNoise;         /* double noise volume when non-zero */
+  int32_t BoostNoise;         /* double noise volume when non-zero */
 
   /* PSG registers: */
-  int Registers[8];       /* Tone, vol x4 */
-  int LatchedRegister;
-  int NoiseShiftRegister;
-  int NoiseFreq;          /* Noise channel signal generator frequency */
+  int32_t Registers[8];       /* Tone, vol x4 */
+  int32_t LatchedRegister;
+  int32_t NoiseShiftRegister;
+  int32_t NoiseFreq;          /* Noise channel signal generator frequency */
 
   /* Output calculation variables */
-  int ToneFreqVals[4];    /* Frequency register values (counters) */
-  int ToneFreqPos[4];     /* Frequency channel flip-flops */
-  int Channels[4];        /* Value of each channel, before stereo is applied */
+  int32_t ToneFreqVals[4];    /* Frequency register values (counters) */
+  int32_t ToneFreqPos[4];     /* Frequency channel flip-flops */
+  int32_t Channels[4];        /* Value of each channel, before stereo is applied */
 
   /* Blip-Buffer variables */
-  int chan_amp[4];        /* current channel amplitudes in delta buffers */
+  int32_t chan_amp[4];        /* current channel amplitudes in delta buffers */
 } SN76489_Context;
 
-static const int PSGVolumeValues[16] = {
+static const int32_t PSGVolumeValues[16] = {
   /* These values are taken from a real SMS2's output */
   /*{892,892,892,760,623,497,404,323,257,198,159,123,96,75,60,0}, */
   /* I can't remember why 892... :P some scaling I did at some point */
@@ -82,7 +82,7 @@ static struct blip_buffer_t* blip;  /* delta resampler */
 
 static SN76489_Context SN76489;
 
-void SN76489_Init(double PSGClockValue, int SamplingRate)
+void SN76489_Init(double PSGClockValue, int32_t SamplingRate)
 {
   SN76489_Shutdown();
   
@@ -94,7 +94,7 @@ void SN76489_Init(double PSGClockValue, int SamplingRate)
 
 void SN76489_Reset()
 {
-  int i;
+  int32_t i;
 
   for(i = 0; i <= 3; i++)
   {
@@ -132,34 +132,34 @@ void SN76489_Shutdown(void)
   blip = NULL;
 }
 
-void SN76489_BoostNoise(int boost)
+void SN76489_BoostNoise(int32_t boost)
 {
   SN76489.BoostNoise = boost;
   SN76489.Channels[3]= PSGVolumeValues[SN76489.Registers[7]] << boost;
 }
 
-void SN76489_SetContext(uint8 *data)
+void SN76489_SetContext(uint8_t *data)
 {
 
   memcpy(&SN76489, data, sizeof(SN76489_Context));
 }
 
-void SN76489_GetContext(uint8 *data)
+void SN76489_GetContext(uint8_t *data)
 {
   memcpy(data, &SN76489, sizeof(SN76489_Context));
 }
 
-uint8 *SN76489_GetContextPtr(void)
+uint8_t *SN76489_GetContextPtr(void)
 {
-  return (uint8 *)&SN76489;
+  return (uint8_t *)&SN76489;
 }
 
-int SN76489_GetContextSize(void)
+int32_t SN76489_GetContextSize(void)
 {
   return sizeof(SN76489_Context);
 }
 
-void SN76489_Write(int data)
+void SN76489_Write(int32_t data)
 {
   if (data & 0x80)
   {
@@ -167,7 +167,7 @@ void SN76489_Write(int data)
     SN76489.LatchedRegister = (data >> 4) & 0x07;
   }
 
-  int LatchedRegister = SN76489.LatchedRegister;
+  int32_t LatchedRegister = SN76489.LatchedRegister;
 
   switch (LatchedRegister)
   {
@@ -209,9 +209,9 @@ void SN76489_Write(int data)
 }
 
 /* Updates tone amplitude in delta buffer. Call whenever amplitude might have changed. */
-static void UpdateToneAmplitude(int i, int time)
+static void UpdateToneAmplitude(int32_t i, int32_t time)
 {
-  int delta = (SN76489.Channels[i] * SN76489.ToneFreqPos[i]) - SN76489.chan_amp[i];
+  int32_t delta = (SN76489.Channels[i] * SN76489.ToneFreqPos[i]) - SN76489.chan_amp[i];
   if (delta != 0)
   {
     SN76489.chan_amp[i] += delta;
@@ -220,9 +220,9 @@ static void UpdateToneAmplitude(int i, int time)
 }
 
 /* Updates noise amplitude in delta buffer. Call whenever amplitude might have changed. */
-static void UpdateNoiseAmplitude(int time)
+static void UpdateNoiseAmplitude(int32_t time)
 {
-  int delta = (SN76489.Channels[3] * ( SN76489.NoiseShiftRegister & 0x1 )) - SN76489.chan_amp[3];
+  int32_t delta = (SN76489.Channels[3] * ( SN76489.NoiseShiftRegister & 0x1 )) - SN76489.chan_amp[3];
   if (delta != 0)
   {
     SN76489.chan_amp[3] += delta;
@@ -231,10 +231,10 @@ static void UpdateNoiseAmplitude(int time)
 }
 
 /* Runs tone channel for clock_length clocks */
-static void RunTone(int i, int clock_length)
+static void RunTone(int32_t i, int32_t clock_length)
 
 {
-  int time;
+  int32_t time;
 
   /* Update in case a register changed etc. */
   UpdateToneAmplitude(i, 0);
@@ -263,13 +263,13 @@ static void RunTone(int i, int clock_length)
 }
 
 /* Runs noise channel for clock_length clocks */
-static void RunNoise(int clock_length)
+static void RunNoise(int32_t clock_length)
 
 {
-  int time;
+  int32_t time;
 
   /* Noise channel: match to tone2 if in slave mode */
-  int NoiseFreq = SN76489.NoiseFreq;
+  int32_t NoiseFreq = SN76489.NoiseFreq;
   if (NoiseFreq == 0x80)
   {
     NoiseFreq = SN76489.Registers[2*2];
@@ -290,7 +290,7 @@ static void RunNoise(int clock_length)
     if (SN76489.ToneFreqPos[3] == 1)
     {
       /* On the positive edge of the square wave (only once per cycle) */
-      int Feedback = SN76489.NoiseShiftRegister;
+      int32_t Feedback = SN76489.NoiseShiftRegister;
       if ( SN76489.Registers[6] & 0x4 )
       {
         /* White noise */
@@ -315,12 +315,12 @@ static void RunNoise(int clock_length)
   SN76489.ToneFreqVals[3] = time - clock_length;
 }
 
-void SN76489_Update(INT16 *buffer, int length)
+void SN76489_Update(int16_t *buffer, int32_t length)
 {
-  int i;
+  int32_t i;
 
   /* Determine how many clocks we need to run until 'length' samples are available */
-  int clock_length = blip_clocks_needed(blip, length);
+  int32_t clock_length = blip_clocks_needed(blip, length);
 
   /* Run noise first, since it might use current value of third tone frequency counter */
   RunNoise(clock_length);

@@ -22,23 +22,23 @@
 
 #include "shared.h"
 
-int state_load(unsigned char *buffer)
+int state_load(uint8_t  *buffer)
 {
   /* buffer size */
-  int bufferptr = 0;
+  int32_t bufferptr = 0;
 
   /* first allocate state buffer */
-  unsigned char *state = (unsigned char *)malloc(STATE_SIZE);
+  uint8_t  *state = (uint8_t  *)malloc(STATE_SIZE);
   if (!state) return 0;
 
   /* uncompress savestate */
-  unsigned long inbytes, outbytes;
+  uint32_t inbytes, outbytes;
   memcpy(&inbytes, buffer, 4);
   outbytes = STATE_SIZE;
   uncompress ((Bytef *)state, &outbytes, (Bytef *)(buffer + 4), inbytes);
 
   /* signature check (GENPLUS-GX x.x.x) */
-  char version[17];
+  int8_t version[17];
   load_param(version,16);
   version[16] = 0;
   if (strncmp(version,STATE_VERSION,11))
@@ -108,8 +108,8 @@ int state_load(unsigned char *buffer)
   // 68000 
   if (system_hw != SYSTEM_PBC)
   {
-    uint16 tmp16;
-    uint32 tmp32;
+    uint16_t tmp16;
+    uint32_t tmp32;
     load_param(&tmp32, 4); m68k_set_reg(M68K_REG_D0, tmp32);
     load_param(&tmp32, 4); m68k_set_reg(M68K_REG_D1, tmp32);
     load_param(&tmp32, 4); m68k_set_reg(M68K_REG_D2, tmp32);
@@ -149,13 +149,13 @@ int state_load(unsigned char *buffer)
   return 1;
 }
 
-int state_save(unsigned char *buffer)
+int32_t state_save(uint8_t  *buffer)
 {
   /* buffer size */
-  int bufferptr = 0;
+  int32_t bufferptr = 0;
 
   /* first allocate state buffer */
-  unsigned char *state = (unsigned char *)malloc(STATE_SIZE);
+  uint8_t  *state = (uint8_t  *)malloc(STATE_SIZE);
   if (!state) return 0;
 
   /* version string */
@@ -197,8 +197,8 @@ int state_save(unsigned char *buffer)
   // 68000 
   if (system_hw != SYSTEM_PBC)
   {
-    uint16 tmp16;
-    uint32 tmp32;
+    uint16_t tmp16;
+    uint32_t tmp32;
     tmp32 = m68k_get_reg(NULL, M68K_REG_D0);  save_param(&tmp32, 4);
     tmp32 = m68k_get_reg(NULL, M68K_REG_D1);  save_param(&tmp32, 4);
     tmp32 = m68k_get_reg(NULL, M68K_REG_D2);  save_param(&tmp32, 4);
@@ -234,8 +234,8 @@ int state_save(unsigned char *buffer)
   }
 
   /* compress state file */
-  unsigned long inbytes   = bufferptr;
-  unsigned long outbytes  = STATE_SIZE;
+  uint32_t inbytes   = bufferptr;
+  uint32_t outbytes  = STATE_SIZE;
   compress2 ((Bytef *)(buffer + 4), &outbytes, (Bytef *)state, inbytes, 9);
   memcpy(buffer, &outbytes, 4);
   free(state);

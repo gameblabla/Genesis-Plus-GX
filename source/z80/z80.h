@@ -38,34 +38,34 @@ typedef struct
 {
   PAIR  pc,sp,af,bc,de,hl,ix,iy,wz;
   PAIR  af2,bc2,de2,hl2;
-  UINT8  r,r2,iff1,iff2,halt,im,i;
-  UINT8  nmi_state;      /* nmi line state */
-  UINT8  nmi_pending;    /* nmi pending */
-  UINT8  irq_state;      /* irq line state */
-  UINT8  after_ei;      /* are we in the EI shadow? */
+  uint8_t  r,r2,iff1,iff2,halt,im,i;
+  uint8_t  nmi_state;      /* nmi line state */
+  uint8_t  nmi_pending;    /* nmi pending */
+  uint8_t  irq_state;      /* irq line state */
+  uint8_t  after_ei;      /* are we in the EI shadow? */
   const struct z80_irq_daisy_chain *daisy;
-  int    (*irq_callback)(int irqline);
+  int32_t    (*irq_callback)(int32_t irqline);
 }  Z80_Regs;
 
 
 extern Z80_Regs Z80;
 
-extern unsigned char *z80_readmap[64];
-extern unsigned char *z80_writemap[64];
+extern uint8_t *z80_readmap[64];
+extern uint8_t *z80_writemap[64];
 
-extern void (*z80_writemem)(unsigned int address, unsigned char data);
-extern unsigned char (*z80_readmem)(unsigned int port);
-extern void (*z80_writeport)(unsigned int port, unsigned char data);
-extern unsigned char (*z80_readport)(unsigned int port);
+extern void (*z80_writemem)(uint32_t address, uint8_t data);
+extern uint8_t (*z80_readmem)(uint32_t port);
+extern void (*z80_writeport)(uint32_t port, uint8_t data);
+extern uint8_t (*z80_readport)(uint32_t port);
 
-extern void z80_init(const void *config, int (*irqcallback)(int));
+extern void z80_init(const void *config, int32_t (*irqcallback)(int32_t));
 extern void z80_reset (void);
 extern void z80_exit (void);
-extern void z80_run(unsigned int cycles);
-extern void z80_burn(unsigned int cycles);
+extern void z80_run(uint32_t cycles);
+extern void z80_burn(uint32_t cycles);
 extern void z80_get_context (void *dst);
 extern void z80_set_context (void *src);
-extern void z80_set_nmi_line(int state);
+extern void z80_set_nmi_line(int32_t state);
 
 #endif
 

@@ -24,10 +24,10 @@
 #define _ACTIVATOR_H_
 
 /* Function prototypes */
-extern void activator_reset(int index);
-extern unsigned char activator_1_read(void);
-extern unsigned char activator_2_read(void);
-extern void activator_1_write(unsigned char data, unsigned char mask);
-extern void activator_2_write(unsigned char data, unsigned char mask);
+extern void activator_reset(int32_t index);
+extern uint8_t activator_1_read(void);
+extern uint8_t activator_2_read(void);
+extern void activator_1_write(uint8_t data, uint8_t mask);
+extern void activator_2_write(uint8_t data, uint8_t mask);
 
 #endif

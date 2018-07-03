@@ -25,18 +25,18 @@
 #include "Fir_Resampler.h"
 
 /* Cycle-accurate samples */
-static unsigned int psg_cycles_ratio;
-static unsigned int psg_cycles_count;
-static unsigned int fm_cycles_ratio;
-static unsigned int fm_cycles_count;
+static uint32_t psg_cycles_ratio;
+static uint32_t psg_cycles_count;
+static uint32_t fm_cycles_ratio;
+static uint32_t fm_cycles_count;
 
 /* YM chip function pointers */
 static void (*YM_Reset)(void);
-static void (*YM_Update)(long int *buffer, int length);
-static void (*YM_Write)(unsigned int a, unsigned int v);
+static void (*YM_Update)(int32_t *buffer, int32_t length);
+static void (*YM_Write)(uint32_t a, uint32_t v);
 
 /* Run FM chip for required M-cycles */
-static inline void fm_update(unsigned int cycles)
+static inline void fm_update(uint32_t cycles)
 {
   if (cycles > fm_cycles_count)
   {
@@ -47,10 +47,10 @@ static inline void fm_update(unsigned int cycles)
     fm_cycles_count += cycles;
 
     /* number of samples during period */
-    unsigned int cnt = cycles / fm_cycles_ratio;
+    uint32_t cnt = cycles / fm_cycles_ratio;
 
     /* remaining cycles */
-    unsigned int remain = cycles % fm_cycles_ratio;
+    uint32_t remain = cycles % fm_cycles_ratio;
     if (remain)
     {
       /* one sample ahead */
@@ -59,24 +59,26 @@ static inline void fm_update(unsigned int cycles)
     }
 
     /* select input sample buffer */
-    int32 *buffer = Fir_Resampler_buffer();
-    if (buffer)
+    int32_t *buffer_32 = Fir_Resampler_buffer();
+    if (buffer_32)
     {
-      Fir_Resampler_write(cnt << 1);
+		Fir_Resampler_write(cnt << 1);
+		/* run FM chip & get samples */
+		YM_Update(buffer_32, cnt);
     }
     else
     {
-      buffer = snd.fm.pos;
+      int32_t* buffer = snd.fm.pos;
       snd.fm.pos += (cnt << 1);
+      YM_Update(buffer, cnt);
     }
 
-    /* run FM chip & get samples */
-    YM_Update(buffer, cnt);
+
   }
 }
 
 /* Run PSG chip for required M-cycles */
-static inline void psg_update(unsigned int cycles)
+static inline void psg_update(uint32_t cycles)
 {
   if (cycles > psg_cycles_count)
   {
@@ -87,10 +89,10 @@ static inline void psg_update(unsigned int cycles)
     psg_cycles_count += cycles;
 
     /* number of samples during period */
-    unsigned int cnt = cycles / psg_cycles_ratio;
+    uint32_t cnt = cycles / psg_cycles_ratio;
 
     /* remaining cycles */
-    unsigned int remain = cycles % psg_cycles_ratio;
+    uint32_t remain = cycles % psg_cycles_ratio;
     if (remain)
     {
       /* one sample ahead */
@@ -129,7 +131,7 @@ void sound_init(void)
   /* For better accuracy, sound chips run in synchronization with 68k and Z80 cpus        */
   /* These values give the exact number of M-cycles between 2 rendered samples.           */
   /* we use 21.11 fixed point precision (max. mcycle value is 3420*313 i.e 21 bits max)   */
-  psg_cycles_ratio  = (unsigned int)(mclk / (double) snd.sample_rate * 2048.0);
+  psg_cycles_ratio  = (uint32_t)(mclk / (double) snd.sample_rate * 2048.0);
   fm_cycles_ratio   = psg_cycles_ratio;
   fm_cycles_count   = 0;
   psg_cycles_count  = 0;
@@ -188,8 +190,8 @@ void sound_reset(void)
 
 void sound_restore()
 {
-  int size;
-  uint8 *ptr, *temp;
+  int32_t size;
+  uint8_t *ptr, *temp;
 
   /* save YM context */
   if (system_hw != SYSTEM_PBC)
@@ -226,9 +228,9 @@ void sound_restore()
   }
 }
 
-int sound_context_save(uint8 *state)
+int32_t sound_context_save(uint8_t *state)
 {
-  int bufferptr = 0;
+  int32_t bufferptr = 0;
   
   if (system_hw != SYSTEM_PBC)
   {
@@ -246,9 +248,9 @@ int sound_context_save(uint8 *state)
   return bufferptr;
 }
 
-int sound_context_load(uint8 *state, char *version)
+int32_t sound_context_load(uint8_t *state, int8_t *version)
 {
-  int bufferptr = 0;
+  int32_t bufferptr = 0;
 
   if ((system_hw != SYSTEM_PBC) || (version[15] == 0x30))
   {
@@ -269,14 +271,14 @@ int sound_context_load(uint8 *state, char *version)
 }
 
 /* End of frame update, return the number of samples run so far.  */
-int sound_update(unsigned int cycles)
+int32_t sound_update(uint32_t cycles)
 {
   /* run PSG & FM chips until end of frame */
   cycles <<= 11;
   psg_update(cycles);
   fm_update(cycles);
 
-  int size = snd.psg.pos - snd.psg.buffer;
+  int32_t size = snd.psg.pos - snd.psg.buffer;
 
 #ifdef LOGSOUND
     error("%d PSG samples available\n",size);
@@ -286,7 +288,7 @@ int sound_update(unsigned int cycles)
   if (config.hq_fm)
   {
     /* get available FM samples */
-    int avail = Fir_Resampler_avail();
+    int32_t avail = Fir_Resampler_avail();
 
     /* resynchronize FM & PSG chips */
     if (avail < size)
@@ -332,28 +334,28 @@ int sound_update(unsigned int cycles)
 }
 
 /* Reset FM chip */
-void fm_reset(unsigned int cycles)
+void fm_reset(uint32_t cycles)
 {
   fm_update(cycles << 11);
   YM_Reset();
 }
 
 /* Write FM chip */
-void fm_write(unsigned int cycles, unsigned int address, unsigned int data)
+void fm_write(uint32_t cycles, uint32_t address, uint32_t data)
 {
   if (address & 1) fm_update(cycles << 11);
   YM_Write(address, data);
 }
 
 /* Read FM status (YM2612 only) */
-unsigned int fm_read(unsigned int cycles, unsigned int address)
+uint32_t fm_read(uint32_t cycles, uint32_t address)
 {
   fm_update(cycles << 11);
   return YM2612Read();
 }
 
 /* Write PSG chip */
-void psg_write(unsigned int cycles, unsigned int data)
+void psg_write(uint32_t cycles, uint32_t data)
 {
   psg_update(cycles << 11);
   SN76489_Write(data);

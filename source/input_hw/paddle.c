@@ -24,22 +24,22 @@
 
 static struct
 {
-  uint8 State;
+  uint8_t State;
 } paddle[2];
 
-void paddle_reset(int index)
+void paddle_reset(int32_t index)
 {
   input.analog[index << 2][0] = 128;
   paddle[index].State = 0x40;
 }
 
-static inline unsigned char paddle_read(int port)
+static inline uint8_t paddle_read(int32_t port)
 {
   /* FIRE button status (active low) */
-  unsigned char temp = ~(input.pad[port] & 0x10);
+  uint8_t temp = ~(input.pad[port] & 0x10);
 
   /* Pad index */
-  int index = port >> 2;
+  int32_t index = port >> 2;
 
   /* Clear low bits */
   temp &= 0x70;
@@ -67,29 +67,29 @@ static inline unsigned char paddle_read(int port)
   return temp;
 }
 
-static inline void paddle_write(int index, unsigned char data, unsigned char mask)
+static inline void paddle_write(int32_t index, uint8_t data, uint8_t mask)
 {
   /* update bits set as output only */
   paddle[index].State = (paddle[index].State & ~mask) | (data & mask);
 }
 
 
-unsigned char paddle_1_read(void)
+uint8_t paddle_1_read(void)
 {
   return paddle_read(0);
 }
 
-unsigned char paddle_2_read(void)
+uint8_t paddle_2_read(void)
 {
   return paddle_read(4);
 }
 
-void paddle_1_write(unsigned char data, unsigned char mask)
+void paddle_1_write(uint8_t data, uint8_t mask)
 {
   paddle_write(0, data, mask);
 }
 
-void paddle_2_write(unsigned char data, unsigned char mask)
+void paddle_2_write(uint8_t data, uint8_t mask)
 {
   paddle_write(1, data, mask);
 }

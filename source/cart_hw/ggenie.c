@@ -26,19 +26,19 @@
 
 static struct
 {
-  uint8 enabled;
-  uint8 *rom;
-  uint16 regs[0x20];
-  uint16 old[6];
-  uint16 data[6];
-  uint32 addr[6];
+  uint8_t enabled;
+  uint8_t *rom;
+  uint16_t regs[0x20];
+  uint16_t old[6];
+  uint16_t data[6];
+  uint32_t addr[6];
 } ggenie;
 
-static unsigned int ggenie_read_byte(unsigned int address);
-static unsigned int ggenie_read_word(unsigned int address);
-static void ggenie_write_byte(unsigned int address, unsigned int data);
-static void ggenie_write_word(unsigned int address, unsigned int data);
-static void ggenie_write_regs(unsigned int offset, unsigned int data);
+static uint32_t ggenie_read_byte(uint32_t address);
+static uint32_t ggenie_read_word(uint32_t address);
+static void ggenie_write_byte(uint32_t address, uint32_t data);
+static void ggenie_write_word(uint32_t address, uint32_t data);
+static void ggenie_write_regs(uint32_t offset, uint32_t data);
 
 void ggenie_init(void)
 {
@@ -53,7 +53,7 @@ void ggenie_init(void)
   ggenie.rom = cart.rom + 0x600000;
 
   /* Load ROM */
-  int i = 0;
+  int32_t i = 0;
   while (i < 0x8000)
   {
     fread(ggenie.rom+i,0x1000,1,f);
@@ -63,7 +63,7 @@ void ggenie_init(void)
 
 #ifdef LSB_FIRST
   /* Byteswap ROM */
-  uint8 temp;
+  uint8_t temp;
   for(i = 0; i < 0x8000; i += 2)
   {
     temp = ggenie.rom[i];
@@ -88,7 +88,7 @@ void ggenie_shutdown(void)
   }
 }
 
-void ggenie_reset(int hard)
+void ggenie_reset(int32_t hard)
 {
   if (ggenie.enabled)
   {
@@ -116,9 +116,9 @@ void ggenie_reset(int hard)
   }
 }
 
-void ggenie_switch(int enable)
+void ggenie_switch(int32_t enable)
 {
-  int i;
+  int32_t i;
   if (enable)
   {
     /* enable cheats */
@@ -128,8 +128,8 @@ void ggenie_switch(int enable)
       if (ggenie.regs[0] & (1 << i))
       {
         /* save old value and patch ROM if enabled */
-        ggenie.old[i] = *(uint16 *)(cart.rom + ggenie.addr[i]);
-        *(uint16 *)(cart.rom + ggenie.addr[i]) = ggenie.data[i];
+        ggenie.old[i] = *(uint16_t *)(cart.rom + ggenie.addr[i]);
+        *(uint16_t *)(cart.rom + ggenie.addr[i]) = ggenie.data[i];
       }
     }
   }
@@ -142,27 +142,27 @@ void ggenie_switch(int enable)
       if (ggenie.regs[0] & (1 << i))
       {
         /* restore original ROM value */
-        *(uint16 *)(cart.rom + ggenie.addr[i]) = ggenie.old[i];
+        *(uint16_t *)(cart.rom + ggenie.addr[i]) = ggenie.old[i];
       }
     }
   }
 }
 
-static unsigned int ggenie_read_byte(unsigned int address)
+static uint32_t ggenie_read_byte(uint32_t address)
 {
-  unsigned int data = ggenie.regs[(address >> 1) & 0x1f];
+  uint32_t data = ggenie.regs[(address >> 1) & 0x1f];
   return ((address & 1) ? (data & 0xff) : ((data >> 8) & 0xff));
 }
 
-static unsigned int ggenie_read_word(unsigned int address)
+static uint32_t ggenie_read_word(uint32_t address)
 {
   return ggenie.regs[(address >> 1) & 0x1f];
 }
 
-static void ggenie_write_byte(unsigned int address, unsigned int data)
+static void ggenie_write_byte(uint32_t address, uint32_t data)
 {
   /* Register offset */
-  uint8 offset = (address >> 1) & 0x1f;
+  uint8_t offset = (address >> 1) & 0x1f;
 
   /* /LWR and /UWR are used to decode writes */
   if (address & 1)
@@ -178,16 +178,16 @@ static void ggenie_write_byte(unsigned int address, unsigned int data)
   ggenie_write_regs(offset,data);
 }
 
-static void ggenie_write_word(unsigned int address, unsigned int data)
+static void ggenie_write_word(uint32_t address, uint32_t data)
 {
   /* Register offset */
-  uint8 offset = (address >> 1) & 0x1f;
+  uint8_t offset = (address >> 1) & 0x1f;
 
   /* Write internal register (full WORD) */
   ggenie_write_regs(offset,data);
 }
 
-static void ggenie_write_regs(unsigned int offset, unsigned int data)
+static void ggenie_write_regs(uint32_t offset, uint32_t data)
 {
   /* update internal register */
   ggenie.regs[offset] = data;

@@ -25,17 +25,17 @@
 #define _GAMEPAD_H_
 
 /* Function prototypes */
-extern void gamepad_reset(int port);
-extern void gamepad_refresh(int port);
-extern unsigned char gamepad_1_read(void);
-extern unsigned char gamepad_2_read(void);
-extern void gamepad_1_write(unsigned char data, unsigned char mask);
-extern void gamepad_2_write(unsigned char data, unsigned char mask);
-extern unsigned char wayplay_1_read(void);
-extern unsigned char wayplay_2_read(void);
-extern void wayplay_1_write(unsigned char data, unsigned char mask);
-extern void wayplay_2_write(unsigned char data, unsigned char mask);
-extern unsigned int jcart_read(unsigned int address);
-extern void jcart_write(unsigned int address, unsigned int data);
+extern void gamepad_reset(int32_t port);
+extern void gamepad_refresh(int32_t port);
+extern uint8_t gamepad_1_read(void);
+extern uint8_t gamepad_2_read(void);
+extern void gamepad_1_write(uint8_t data, uint8_t mask);
+extern void gamepad_2_write(uint8_t data, uint8_t mask);
+extern uint8_t wayplay_1_read(void);
+extern uint8_t wayplay_2_read(void);
+extern void wayplay_1_write(uint8_t data, uint8_t mask);
+extern void wayplay_2_write(uint8_t data, uint8_t mask);
+extern uint32_t jcart_read(uint32_t address);
+extern void jcart_write(uint32_t address, uint32_t data);
 
 #endif

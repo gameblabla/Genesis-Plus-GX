@@ -26,15 +26,15 @@
 
 static struct
 {
-  uint8 State;
-  uint8 Counter;
-  uint8 Timeout;
+  uint8_t State;
+  uint8_t Counter;
+  uint8_t Timeout;
 } gamepad[MAX_DEVICES];
 
-static uint8 pad_index;
+static uint8_t pad_index;
 
 
-void gamepad_reset(int port)
+void gamepad_reset(int32_t port)
 {
   /* default state (Gouketsuji Ichizoku / Power Instinct, Samurai Spirits / Samurai Shodown) */
   gamepad[port].State = 0x40;
@@ -45,7 +45,7 @@ void gamepad_reset(int port)
   pad_index = 0;
 }
 
-void gamepad_refresh(int port)
+void gamepad_refresh(int32_t port)
 {
   /* 6-buttons pad */
   if (gamepad[port].Timeout++ > 25)
@@ -55,16 +55,16 @@ void gamepad_refresh(int port)
   }
 }
 
-static inline unsigned char gamepad_read(int port)
+static inline uint8_t gamepad_read(int32_t port)
 {
   /* bit 7 is latched, returns current TH state */
-  unsigned int data = (gamepad[port].State & 0x40) | 0x3F;
+  uint32_t data = (gamepad[port].State & 0x40) | 0x3F;
 
   /* pad value */
-  unsigned int val = input.pad[port];
+  uint32_t val = input.pad[port];
 
   /* get current step (TH state) */
-  unsigned int step = (gamepad[port].Counter & 6) | ((data >> 6) & 1);
+  uint32_t step = (gamepad[port].Counter & 6) | ((data >> 6) & 1);
 
   switch (step)
   {
@@ -126,7 +126,7 @@ static inline unsigned char gamepad_read(int port)
   return data;
 }
 
-static inline void gamepad_write(int port, unsigned char data, unsigned char mask)
+static inline void gamepad_write(int32_t port, uint8_t data, uint8_t mask)
 {
   /* update bits set as output only */
   data = (gamepad[port].State & ~mask) | (data & mask);
@@ -150,22 +150,22 @@ static inline void gamepad_write(int port, unsigned char data, unsigned char mas
 /*  Default ports handlers                                                  */
 /*--------------------------------------------------------------------------*/
 
-unsigned char gamepad_1_read(void)
+uint8_t gamepad_1_read(void)
 {
   return gamepad_read(0);
 }
 
-unsigned char gamepad_2_read(void)
+uint8_t gamepad_2_read(void)
 {
   return gamepad_read(4);
 }
 
-void gamepad_1_write(unsigned char data, unsigned char mask)
+void gamepad_1_write(uint8_t data, uint8_t mask)
 {
   gamepad_write(0, data, mask);
 }
 
-void gamepad_2_write(unsigned char data, unsigned char mask)
+void gamepad_2_write(uint8_t data, uint8_t mask)
 {
   gamepad_write(4, data, mask);
 }
@@ -174,7 +174,7 @@ void gamepad_2_write(unsigned char data, unsigned char mask)
 /*  4-WayPlay ports handler                                                 */
 /*--------------------------------------------------------------------------*/
 
-unsigned char wayplay_1_read(void)
+uint8_t wayplay_1_read(void)
 {
   if (pad_index < 4)
   {
@@ -185,12 +185,12 @@ unsigned char wayplay_1_read(void)
   return 0x70;
 }
 
-unsigned char wayplay_2_read(void)
+uint8_t wayplay_2_read(void)
 {
   return 0x7F;
 }
 
-void wayplay_1_write(unsigned char data, unsigned char mask)
+void wayplay_1_write(uint8_t data, uint8_t mask)
 {
   if (pad_index < 4)
   {
@@ -198,7 +198,7 @@ void wayplay_1_write(unsigned char data, unsigned char mask)
   }
 }
 
-void wayplay_2_write(unsigned char data, unsigned char mask)
+void wayplay_2_write(uint8_t data, uint8_t mask)
 {
   if ((mask & 0x70) == 0x70)
   {
@@ -211,13 +211,13 @@ void wayplay_2_write(unsigned char data, unsigned char mask)
 /*  J-Cart memory handlers                                                  */
 /*--------------------------------------------------------------------------*/
 
-unsigned int jcart_read(unsigned int address)
+uint32_t jcart_read(uint32_t address)
 {
    /* TH2 output read is fixed to zero (fixes Micro Machines 2) */
    return ((gamepad_read(5) & 0x7F) | ((gamepad_read(6) & 0x3F) << 8));
 }
 
-void jcart_write(unsigned int address, unsigned int data)
+void jcart_write(uint32_t address, uint32_t data)
 {
   gamepad_write(5, (data & 1) << 6, 0x40);
   gamepad_write(6, (data & 1) << 6, 0x40);

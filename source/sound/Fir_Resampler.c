@@ -12,18 +12,18 @@
 
 /* sound buffer */
 static sample_t *buffer = NULL;
-static int buffer_size = 0;
+static int32_t buffer_size = 0;
 
 static sample_t impulses[MAX_RES][WIDTH];
 static sample_t* write_pos = NULL;
-static int res = 1;
-static int imp_phase = 0;
-static unsigned long skip_bits = 0;
-static int step = STEREO;
-static int input_per_cycle;
+static int32_t res = 1;
+static int32_t imp_phase = 0;
+static uint32_t skip_bits = 0;
+static int32_t step = STEREO;
+static int32_t input_per_cycle;
 static double ratio = 1.0;
 
-static void gen_sinc(double rolloff, int width, double offset, double spacing, double scale, int count, sample_t *out )
+static void gen_sinc(double rolloff, int32_t width, double offset, double spacing, double scale, int32_t count, sample_t *out )
 {
   double w, rolloff_cos_a, num, den, sinc;
   double const maxh = 256;
@@ -47,41 +47,19 @@ static void gen_sinc(double rolloff, int width, double offset, double spacing, d
       den = 1 - rolloff_cos_a - rolloff_cos_a + rolloff * rolloff;
       sinc = scale * num / den - scale;
 
-      out [-1] = (short) (cos( w ) * sinc + sinc);
+      out [-1] = (int16_t) (cos( w ) * sinc + sinc);
     }
     angle += fstep;
   }
 }
 
-/*static int available( long input_count )
+int32_t Fir_Resampler_avail()
 {
-  int cycle_count = input_count / input_per_cycle;
-  int output_count = cycle_count * res * STEREO;
-  input_count -= cycle_count * input_per_cycle;
-
-  unsigned long skip = skip_bits >> imp_phase;
-  int remain = res - imp_phase;
-  while ( input_count >= 0 )
-  {
-    input_count -= step + (skip & 1) * STEREO;
-    skip >>= 1;
-    if ( !--remain )
-    {
-      skip = skip_bits;
-      remain = res;
-    }
-    output_count += 2;
-  }
-  return output_count;
-}
-*/
-int Fir_Resampler_avail()
-{
-  long count = 0;
+  int32_t count = 0;
   sample_t* in = buffer;
   sample_t* end_pos = write_pos;
-  unsigned long skip = skip_bits >> imp_phase;
-  int remain = res - imp_phase;
+  uint32_t skip = skip_bits >> imp_phase;
+  int32_t remain = res - imp_phase;
   if ( end_pos - in >= WIDTH * STEREO )
   {
     end_pos -= WIDTH * STEREO;
@@ -105,7 +83,7 @@ int Fir_Resampler_avail()
   return count;
 }
 
-int Fir_Resampler_initialize( int new_size )
+int32_t Fir_Resampler_initialize( int32_t new_size )
 {
   res       = 1;
   skip_bits = 0;
@@ -142,7 +120,7 @@ double Fir_Resampler_time_ratio( double new_factor, double rolloff )
 {
   ratio = new_factor;
 
-  int i, r;
+  int32_t i, r;
   double nearest, error;
   double fstep = 0.0;
   double least_error = 2;
@@ -181,9 +159,9 @@ double Fir_Resampler_time_ratio( double new_factor, double rolloff )
 
   for ( i = 0; i < res; i++ )
   {
-    gen_sinc( rolloff, (int) (WIDTH * filter + 1) & ~1, pos, filter,
+    gen_sinc( rolloff, (int32_t) (WIDTH * filter + 1) & ~1, pos, filter,
               (double) (0x7FFF * GAIN * filter),
-              (int) WIDTH, impulses[i] );
+              (int32_t) WIDTH, impulses[i] );
 
     pos += fstep;
     input_per_cycle += step;
@@ -211,7 +189,7 @@ double Fir_Resampler_ratio( void )
 }
 
 /* Number of input samples that can be written */
-int Fir_Resampler_max_write( void )
+int32_t Fir_Resampler_max_write( void )
 {
   return buffer + buffer_size - write_pos;
 }
@@ -223,34 +201,28 @@ sample_t* Fir_Resampler_buffer( void )
 }
 
 /* Number of input samples in buffer */
-int Fir_Resampler_written( void )
+int32_t Fir_Resampler_written( void )
 {
   return write_pos - &buffer [WRITE_OFFSET];
 }
 
-/* Number of output samples available */
-/*int Fir_Resampler_avail( void )
-{
-  return available( write_pos - &buffer [WIDTH * STEREO] );
-}*/
-
-void Fir_Resampler_write( long count )
+void Fir_Resampler_write( int32_t count )
 {
   write_pos += count;
 }
 
-int Fir_Resampler_read( sample_t* out, long count )
+int32_t Fir_Resampler_read( sample_t* out, int32_t count )
 {
   sample_t* out_ = out;
   sample_t* in = buffer;
   sample_t* end_pos = write_pos;
-  unsigned long skip = skip_bits >> imp_phase;
+  uint32_t skip = skip_bits >> imp_phase;
   sample_t const* imp = impulses [imp_phase];
-  int remain = res - imp_phase;
-  int n;
-  int pt0,pt1;
+  int32_t remain = res - imp_phase;
+  int32_t n;
+  int32_t pt0,pt1;
   sample_t* i;
-  long l,r;
+  int32_t l,r;
 
   if ( end_pos - in >= WIDTH * STEREO )
   {
@@ -304,7 +276,7 @@ int Fir_Resampler_read( sample_t* out, long count )
 
   imp_phase = res - remain;
 
-  int left = write_pos - in;
+  int32_t left = write_pos - in;
   write_pos = &buffer [left];
   memmove( buffer, in, left * sizeof *in );
 
@@ -312,12 +284,12 @@ int Fir_Resampler_read( sample_t* out, long count )
 }
 
  /* fixed (Eke_Eke) */
-int Fir_Resampler_input_needed( long output_count )
+int32_t Fir_Resampler_input_needed( int32_t output_count )
 {
-  long input_count = 0;
+  int32_t input_count = 0;
 
-  unsigned long skip = skip_bits >> imp_phase;
-  int remain = res - imp_phase;
+  uint32_t skip = skip_bits >> imp_phase;
+  int32_t remain = res - imp_phase;
   while ( (output_count) > 0 )
   {
     input_count += step + (skip & 1) * STEREO;
@@ -330,16 +302,16 @@ int Fir_Resampler_input_needed( long output_count )
     output_count --;
   }
 
-  long input_extra = input_count - (write_pos - &buffer [WRITE_OFFSET]);
+  uint32_t input_extra = input_count - (write_pos - &buffer [WRITE_OFFSET]);
   if ( input_extra < 0 )
     input_extra = 0;
   return (input_extra >> 1);
 }
 
-int Fir_Resampler_skip_input( long count )
+int32_t Fir_Resampler_skip_input( int32_t count )
 {
-  int remain = write_pos - buffer;
-  int max_count = remain - WIDTH * STEREO;
+  int32_t remain = write_pos - buffer;
+  int32_t max_count = remain - WIDTH * STEREO;
   if ( count > max_count )
     count = max_count;
 

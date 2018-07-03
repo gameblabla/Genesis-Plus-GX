@@ -24,16 +24,18 @@
 #ifndef _SOUND_H_
 #define _SOUND_H_
 
+#include <stdint.h>
+
 /* Function prototypes */
 extern void sound_init(void);
 extern void sound_reset(void);
 extern void sound_restore(void);
-extern int sound_context_save(uint8 *state);
-extern int sound_context_load(uint8 *state, char *version);
-extern int sound_update(unsigned int cycles);
-extern void fm_reset(unsigned int cycles);
-extern void fm_write(unsigned int cycles, unsigned int address, unsigned int data);
-extern unsigned int fm_read(unsigned int cycles, unsigned int address);
-extern void psg_write(unsigned int cycles, unsigned int data);
+extern int32_t sound_context_save(uint8_t *state);
+extern int32_t sound_context_load(uint8_t *state, int8_t *version);
+extern int32_t sound_update(uint32_t cycles);
+extern void fm_reset(uint32_t cycles);
+extern void fm_write(uint32_t cycles, uint32_t address, uint32_t data);
+extern uint32_t fm_read(uint32_t cycles, uint32_t address);
+extern void psg_write(uint32_t cycles, uint32_t data);
 
 #endif /* _SOUND_H_ */

@@ -27,14 +27,14 @@
 /*  machine lock up.                                                        */
 /*--------------------------------------------------------------------------*/
 
-static inline void z80_unused_w(unsigned int address, unsigned char data)
+static inline void z80_unused_w(uint32_t  address, uint8_t  data)
 {
 #ifdef LOGERROR
   error("Z80 unused write %04X = %02X (%x)\n", address, data, Z80.pc.w.l);
 #endif
 }
 
-static inline unsigned char z80_unused_r(unsigned int address)
+static inline uint8_t  z80_unused_r(uint32_t  address)
 {
 #ifdef LOGERROR
   error("Z80 unused read %04X (%x)\n", address, Z80.pc.w.l);
@@ -42,7 +42,7 @@ static inline unsigned char z80_unused_r(unsigned int address)
   return 0xFF;
 }
 
-static inline void z80_lockup_w(unsigned int address, unsigned char data)
+static inline void z80_lockup_w(uint32_t  address, uint8_t  data)
 {
 #ifdef LOGERROR
   error("Z80 lockup write %04X = %02X (%x)\n", address, data, Z80.pc.w.l);
@@ -54,7 +54,7 @@ static inline void z80_lockup_w(unsigned int address, unsigned char data)
   }
 }
 
-static inline unsigned char z80_lockup_r(unsigned int address)
+static inline uint8_t  z80_lockup_r(uint32_t  address)
 {
 #ifdef LOGERROR
   error("Z80 lockup read %04X (%x)\n", address, Z80.pc.w.l);
@@ -72,7 +72,7 @@ static inline unsigned char z80_lockup_r(unsigned int address)
 /*  Z80 Memory handlers (Genesis mode)                                      */
 /*--------------------------------------------------------------------------*/
 
-unsigned char z80_md_memory_r(unsigned int address)
+uint8_t  z80_md_memory_r(uint32_t  address)
 {
   switch((address >> 13) & 7)
   {
@@ -99,7 +99,7 @@ unsigned char z80_md_memory_r(unsigned int address)
     default: /* $8000-$FFFF: 68k bank (32K) */
     {
       address = zbank | (address & 0x7FFF);
-      unsigned int slot = address >> 16;
+      uint32_t  slot = address >> 16;
       if (zbank_memory_map[slot].read)
       {
         return (*zbank_memory_map[slot].read)(address);
@@ -110,7 +110,7 @@ unsigned char z80_md_memory_r(unsigned int address)
 }
 
 
-void z80_md_memory_w(unsigned int address, unsigned char data)
+void z80_md_memory_w(uint32_t  address, uint8_t  data)
 {
   switch((address >> 13) & 7)
   {
@@ -154,7 +154,7 @@ void z80_md_memory_w(unsigned int address, unsigned char data)
     default: /* $8000-$FFFF: 68k bank (32K) */
     {
       address = zbank | (address & 0x7FFF);
-      unsigned int slot = address >> 16;
+      uint32_t  slot = address >> 16;
       if (zbank_memory_map[slot].write)
       {
         (*zbank_memory_map[slot].write)(address, data);
@@ -171,7 +171,7 @@ void z80_md_memory_w(unsigned int address, unsigned char data)
 /*  Z80 Memory handlers (Master System mode)                                */
 /*--------------------------------------------------------------------------*/
 
-unsigned char z80_sms_memory_r(unsigned int address)
+uint8_t  z80_sms_memory_r(uint32_t  address)
 {
   return z80_readmap[(address) >> 10][(address) & 0x03FF];
 }
@@ -186,7 +186,7 @@ unsigned char z80_sms_memory_r(unsigned int address)
     Thunder Force IV reads port $BF in it's interrupt handler.
 */
 
-unsigned char z80_unused_port_r(unsigned int port)
+uint8_t  z80_unused_port_r(uint32_t  port)
 {
 #if LOGERROR
   error("Z80 unused read from port %04X (%x)\n", port, Z80.pc.w.l);
@@ -194,14 +194,14 @@ unsigned char z80_unused_port_r(unsigned int port)
   return 0xFF;
 }
 
-void z80_unused_port_w(unsigned int port, unsigned char data)
+void z80_unused_port_w(uint32_t  port, uint8_t  data)
 {
 #if LOGERROR
   error("Z80 unused write to port %04X = %02X (%x)\n", port, data, Z80.pc.w.l);
 #endif
 }
 
-void z80_sms_port_w(unsigned int port, unsigned char data)
+void z80_sms_port_w(uint32_t  port, uint8_t  data)
 {
   switch (port & 0xC1)
   {
@@ -265,7 +265,7 @@ void z80_sms_port_w(unsigned int port, unsigned char data)
   }
 }
 
-unsigned char z80_sms_port_r(unsigned int port)
+uint8_t  z80_sms_port_r(uint32_t  port)
 {
   switch (port & 0xC1)
   {

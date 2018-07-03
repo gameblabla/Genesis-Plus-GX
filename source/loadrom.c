@@ -62,19 +62,19 @@
 
 typedef struct
 {
-  char companyid[6];
-  char company[26];
+  int8_t companyid[6];
+  int8_t company[26];
 } COMPANYINFO;
 
 typedef struct
 {
-  char pID[2];
-  char pName[14];
+  int8_t pID[2];
+  int8_t pName[14];
 } PERIPHERALINFO;
 
 
 ROMINFO rominfo;
-char rom_filename[256];
+int8_t rom_filename[256];
 
 
 /***************************************************************************
@@ -179,10 +179,10 @@ static const PERIPHERALINFO peripheralinfo[MAXPERIPHERALS] =
   *
   * Compute ROM real checksum.
   ***************************************************************************/
-static uint16 getchecksum(uint8 *rom, int length)
+static uint16_t getchecksum(uint8_t *rom, int32_t length)
 {
-  int i;
-  uint16 checksum = 0;
+  int32_t i;
+  uint16_t checksum = 0;
 
   for (i = 0; i < length; i += 2)
   {
@@ -196,9 +196,9 @@ static uint16 getchecksum(uint8 *rom, int length)
   *
   * Pass a pointer to the ROM base address.
   ***************************************************************************/
-static void getrominfo(char *romheader)
+static void getrominfo(int8_t *romheader)
 {
-  uint16 offset = 0;
+  uint16_t offset = 0;
 
   /* Clear ROM info structure */
   memset (&rominfo, 0, sizeof (ROMINFO));
@@ -299,7 +299,7 @@ static void getrominfo(char *romheader)
 
     /* Domestic (japanese) name */
     rominfo.domestic[0] = romheader[ROMDOMESTIC];
-    int i, j = 1;
+    int32_t i, j = 1;
     for (i=1; i<48; i++)
     {
       if ((rominfo.domestic[j-1] != 32) || (romheader[ROMDOMESTIC + i] != 32))
@@ -335,7 +335,7 @@ static void getrominfo(char *romheader)
 #ifdef LSB_FIRST
     rominfo.checksum =  (rominfo.checksum >> 8) | ((rominfo.checksum & 0xff) << 8);
 #endif
-    rominfo.realchecksum = getchecksum(((uint8 *) cart.rom) + 0x200, cart.romsize - 0x200);
+    rominfo.realchecksum = getchecksum(((uint8_t *) cart.rom) + 0x200, cart.romsize - 0x200);
 
     /* Supported peripherals */
     rominfo.peripherals = 0;
@@ -351,10 +351,10 @@ static void getrominfo(char *romheader)
   *
   * Convert interleaved (.smd) ROM files.
   ***************************************************************************/
-static void deinterleave_block(uint8 * src)
+static void deinterleave_block(uint8_t * src)
 {
-  int i;
-  uint8 block[0x4000];
+  int32_t i;
+  uint8_t block[0x4000];
   memcpy (block, src, 0x4000);
   for (i = 0; i < 0x2000; i += 1)
   {
@@ -368,14 +368,14 @@ static void deinterleave_block(uint8 * src)
   *
   * Load a new ROM file.
   ***************************************************************************/
-int load_rom(char *filename)
+int32_t load_rom(int8_t *filename)
 {
-  int i, size;
+  int32_t i, size;
  
 #ifdef NGC
   size = cart.romsize;
 #else
-  uint8 *ptr;
+  uint8_t *ptr;
   ptr = load_archive(filename, &size);
   if(!ptr) return (0);
   memcpy(cart.rom, ptr, size);
@@ -390,7 +390,7 @@ int load_rom(char *filename)
   }
 
   /* Get file extension */
-  if (!strnicmp(".sms", &filename[strlen(filename) - 4], 4))
+  if (!strncmp(".sms", &filename[strlen(filename) - 4], 4))
   {
     /* Force SMS compatibility mode */
     system_hw = SYSTEM_PBC;
@@ -435,7 +435,7 @@ int load_rom(char *filename)
   {
 #ifdef LSB_FIRST
     /* Byteswap ROM */
-    uint8 temp;
+    uint8_t temp;
     for(i = 0; i < size; i += 2)
     {
       temp = cart.rom[i];
@@ -448,7 +448,7 @@ int load_rom(char *filename)
     if (((strstr(rominfo.product,"-K0101") != NULL) && (rominfo.checksum == 0xf424)) ||
         ((strstr(rominfo.product,"-K0109") != NULL) && (rominfo.checksum == 0x4f10)))
     {
-      uint8 temp;
+      uint8_t temp;
       for(i = 0; i < size; i += 2)
       {
         temp = cart.rom[i];
@@ -486,14 +486,14 @@ void region_autodetect(void)
     /* 0010 = japan  pal (2) */
     /* 0100 = usa        (4) */
     /* 1000 = europe     (8) */
-    int country = 0;
-    int i = 0;
-    char c;
+    int32_t country = 0;
+    int32_t i = 0;
+    int8_t c;
 
     /* from Gens */
-    if (!strnicmp(rominfo.country, "eur", 3)) country |= 8;
-    else if (!strnicmp(rominfo.country, "usa", 3)) country |= 4;
-    else if (!strnicmp(rominfo.country, "jap", 3)) country |= 1;
+    if (!strncmp(rominfo.country, "eur", 3)) country |= 8;
+    else if (!strncmp(rominfo.country, "usa", 3)) country |= 4;
+    else if (!strncmp(rominfo.country, "jap", 3)) country |= 1;
     else
     {
       /* look for each characters */
@@ -555,11 +555,11 @@ void region_autodetect(void)
  * It seems that there can be pretty much anything you like following the
  * copyright (C) symbol!
  ****************************************************************************/
-char *get_company(void)
+int8_t *get_company(void)
 {
-  char *s;
-  int i;
-  char company[10];
+  int8_t *s;
+  int32_t i;
+  int8_t company[10];
 
   for (i = 3; i < 8; i++) 
   {
@@ -600,7 +600,7 @@ char *get_company(void)
  * Return peripheral name based on header code
  *
  ****************************************************************************/
-char *get_peripheral(int index)
+int8_t *get_peripheral(int32_t index)
 {
   if (index < MAXPERIPHERALS)
     return (char *)peripheralinfo[index].pName;

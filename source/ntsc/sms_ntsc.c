@@ -87,13 +87,13 @@ void sms_ntsc_init( sms_ntsc_t* ntsc, sms_ntsc_setup_t const* setup )
 #ifndef SMS_NTSC_NO_BLITTERS
 
 /* modified blitters to work on a line basis with genesis plus renderer*/
-void sms_ntsc_blit( sms_ntsc_t const* ntsc, SMS_NTSC_IN_T const* table, unsigned char* input,
-                    int in_width, int vline)
+void sms_ntsc_blit( sms_ntsc_t const* ntsc, SMS_NTSC_IN_T const* table, uint8_t* input,
+                    int32_t in_width, int32_t vline)
 {
-  int const chunk_count = in_width / sms_ntsc_in_chunk;
+  int32_t const chunk_count = in_width / sms_ntsc_in_chunk;
 
   /* handle extra 0, 1, or 2 pixels by placing them at beginning of row */
-  int const in_extra = in_width - chunk_count * sms_ntsc_in_chunk;
+  int32_t const in_extra = in_width - chunk_count * sms_ntsc_in_chunk;
   unsigned const extra2 = (unsigned) -(in_extra >> 1 & 1); /* (unsigned) -1 = ~0 */
   unsigned const extra1 = (unsigned) -(in_extra & 1) | extra2;
 

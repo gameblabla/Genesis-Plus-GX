@@ -191,9 +191,6 @@
 
 #include "shared.h"
 
-
-#define u32 unsigned int
-
 //#define USE_DEBUGGER
 
 // 0
@@ -218,13 +215,13 @@
 
 #define IJind  (((op>>6)&4)|(op&3))
 
-#define GET_PC() (PC - (unsigned short *)svp->iram_rom)
-#define GET_PPC_OFFS() ((unsigned int)PC - (unsigned int)svp->iram_rom - 2)
-#define SET_PC(d) PC = (unsigned short *)svp->iram_rom + d
+#define GET_PC() (PC - (uint16_t *)svp->iram_rom)
+#define GET_PPC_OFFS() ((uint32_t)PC - (uint32_t)svp->iram_rom - 2)
+#define SET_PC(d) PC = (uint16_t *)svp->iram_rom + d
 
 #define REG_READ(r) (((r) <= 4) ? ssp->gr[r].h : read_handlers[r]())
 #define REG_WRITE(r,d) { \
-  int r1 = r; \
+  int32_t r1 = r; \
   if (r1 >= 4) write_handlers[r1](d); \
   else if (r1 > 0) ssp->gr[r1].h = d; \
 }
@@ -278,14 +275,14 @@
 }
 
 #define OP_CMPA(x) { \
-  u32 t = rA32 - ((x) << 16); \
+  uint32_t t = rA32 - ((x) << 16); \
   rST &= ~(SSP_FLAG_L|SSP_FLAG_Z|SSP_FLAG_V|SSP_FLAG_N); \
   if (!t) rST |= SSP_FLAG_Z; \
   else    rST |= (t>>16)&SSP_FLAG_N; \
 }
 
 #define OP_CMPA32(x) { \
-  u32 t = rA32 - (x); \
+  uint32_t t = rA32 - (x); \
   rST &= ~(SSP_FLAG_L|SSP_FLAG_Z|SSP_FLAG_V|SSP_FLAG_N); \
   if (!t) rST |= SSP_FLAG_Z; \
   else    rST |= (t>>16)&SSP_FLAG_N; \
@@ -340,19 +337,19 @@
 
 
 static ssp1601_t *ssp = NULL;
-static unsigned short *PC;
-static int g_cycles;
+static uint16_t *PC;
+static int32_t g_cycles;
 
 #ifdef USE_DEBUGGER
-static int running = 0;
-static int last_iram = 0;
+static int32_t running = 0;
+static int32_t last_iram = 0;
 #endif
 
 // -----------------------------------------------------
 // register i/o handlers
 
 // 0-4, 13
-static u32 read_unknown(void)
+static uint32_t read_unknown(void)
 {
 #ifdef LOG_SVP
   elprintf(EL_ANOMALY|EL_SVP, "ssp FIXME: unknown read @ %04x", GET_PPC_OFFS());
@@ -360,7 +357,7 @@ static u32 read_unknown(void)
   return 0;
 }
 
-static void write_unknown(u32 d)
+static void write_unknown(uint32_t d)
 {
 #ifdef LOG_SVP
   elprintf(EL_ANOMALY|EL_SVP, "ssp FIXME: unknown write @ %04x", GET_PPC_OFFS());
@@ -368,7 +365,7 @@ static void write_unknown(u32 d)
 }
 
 // 4
-static void write_ST(u32 d)
+static void write_ST(uint32_t d)
 {
   //if ((rST ^ d) & 0x0007) elprintf(EL_SVP, "ssp RPL %i -> %i @ %04x", rST&7, d&7, GET_PPC_OFFS());
 #ifdef LOG_SVP
@@ -378,10 +375,10 @@ static void write_ST(u32 d)
 }
 
 // 5
-static u32 read_STACK(void)
+static uint32_t read_STACK(void)
 {
   --rSTACK;
-  if ((short)rSTACK < 0) {
+  if ((int16_t)rSTACK < 0) {
     rSTACK = 5;
 #ifdef LOG_SVP
     elprintf(EL_ANOMALY|EL_SVP, "ssp FIXME: stack underflow! (%i) @ %04x", rSTACK, GET_PPC_OFFS());
@@ -390,7 +387,7 @@ static u32 read_STACK(void)
   return ssp->stack[rSTACK];
 }
 
-static void write_STACK(u32 d)
+static void write_STACK(uint32_t d)
 {
   if (rSTACK >= 6) {
 #ifdef LOG_SVP
@@ -402,32 +399,32 @@ static void write_STACK(u32 d)
 }
 
 // 6
-static u32 read_PC(void)
+static uint32_t read_PC(void)
 {
   //g_cycles--;
   return GET_PC();
 }
 
-static void write_PC(u32 d)
+static void write_PC(uint32_t d)
 {
   SET_PC(d);
   g_cycles--;
 }
 
 // 7
-static u32 read_P(void)
+static uint32_t read_P(void)
 {
-  int m1 = (signed short)rX;
-  int m2 = (signed short)rY;
+  int32_t m1 = (int16_t)rX;
+  int32_t m2 = (int16_t)rY;
   rP.v = (m1 * m2 * 2);
   return rP.h;
 }
 
 // -----------------------------------------------------
 
-static int get_inc(int mode)
+static int32_t get_inc(int32_t mode)
 {
-  int inc = (mode >> 11) & 7;
+  int32_t inc = (mode >> 11) & 7;
   if (inc != 0) {
     if (inc != 7) inc--;
     //inc = (1<<16) << inc; // 0 1 2 4 8 16 32 128
@@ -445,7 +442,7 @@ static int get_inc(int mode)
   if (d & 0x000f) { dst &= ~0x000f; dst |= d & 0x000f; } \
 }
 
-static u32 pm_io(int reg, int write, u32 d)
+static uint32_t pm_io(int32_t reg, int32_t write, uint32_t d)
 {
   if (ssp->emu_status & SSP_PMC_SET)
   {
@@ -488,20 +485,20 @@ static u32 pm_io(int reg, int write, u32 d)
 #ifdef LOG_SVP
     #define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
 #endif
-    unsigned short *dram = (unsigned short *)svp->dram;
+    uint16_t *dram = (uint16_t *)svp->dram;
     if (write)
     {
       /*int mode = ssp->pmac_write[reg]&0xffff;
       int addr = ssp->pmac_write[reg]>>16;*/
-      int addr = ssp->pmac_write[reg]&0xffff;
-      int mode = ssp->pmac_write[reg]>>16;
+      int32_t addr = ssp->pmac_write[reg]&0xffff;
+      int32_t mode = ssp->pmac_write[reg]>>16;
 #ifdef LOG_SVP
       if ((mode & 0xb800) == 0xb800)
         elprintf(EL_SVP|EL_ANOMALY, "ssp FIXME: mode %04x", mode);
 #endif
       if ((mode & 0x43ff) == 0x0018) // DRAM
       {
-        int inc = get_inc(mode);
+        int32_t inc = get_inc(mode);
 #ifdef LOG_SVP
         elprintf(EL_SVP, "ssp PM%i DRAM w [%06x] %04x (inc %i, ovrw %i)",
           reg, CADDR, d, inc >> 16, (mode>>10)&1);
@@ -525,13 +522,13 @@ static u32 pm_io(int reg, int write, u32 d)
       }
       else if ((mode & 0x47ff) == 0x001c) // IRAM
       {
-        int inc = get_inc(mode);
+        int32_t inc = get_inc(mode);
 #ifdef LOG_SVP
         if ((addr&0xfc00) != 0x8000)
           elprintf(EL_SVP|EL_ANOMALY, "ssp FIXME: invalid IRAM addr: %04x", addr<<1);
         elprintf(EL_SVP, "ssp IRAM w [%06x] %04x (inc %i)", (addr<<1)&0x7ff, d, inc >> 16);
 #endif
-        ((unsigned short *)svp->iram_rom)[addr&0x3ff] = d;
+        ((uint16_t  *)svp->iram_rom)[addr&0x3ff] = d;
         ssp->pmac_write[reg] += inc;
       }
 #ifdef LOG_SVP
@@ -546,25 +543,25 @@ static u32 pm_io(int reg, int write, u32 d)
     {
       /*int mode = ssp->pmac_read[reg]&0xffff;
       int addr = ssp->pmac_read[reg]>>16;*/
-      int addr = ssp->pmac_read[reg]&0xffff;
-      int mode = ssp->pmac_read[reg]>>16;
+      int32_t addr = ssp->pmac_read[reg]&0xffff;
+      int32_t mode = ssp->pmac_read[reg]>>16;
 
       if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
       {
 #ifdef LOG_SVP
         elprintf(EL_SVP, "ssp ROM  r [%06x] %04x", CADDR,
-          ((unsigned short *)cart.rom)[addr|((mode&0xf)<<16)]);
+          ((uint16_t  *)cart.rom)[addr|((mode&0xf)<<16)]);
 #endif
-        /*if ((signed int)ssp->pmac_read[reg] >> 16 == -1) ssp->pmac_read[reg]++;
+        /*if ((int32_t )ssp->pmac_read[reg] >> 16 == -1) ssp->pmac_read[reg]++;
         ssp->pmac_read[reg] += 1<<16;*/
-        if ((signed int)(ssp->pmac_read[reg] & 0xffff) == -1) ssp->pmac_read[reg] += 1<<16;
+        if ((int32_t )(ssp->pmac_read[reg] & 0xffff) == -1) ssp->pmac_read[reg] += 1<<16;
         ssp->pmac_read[reg] ++;
         
-        d = ((unsigned short *)cart.rom)[addr|((mode&0xf)<<16)];
+        d = ((uint16_t  *)cart.rom)[addr|((mode&0xf)<<16)];
       }
       else if ((mode & 0x47ff) == 0x0018) // DRAM
       {
-        int inc = get_inc(mode);
+        int32_t inc = get_inc(mode);
 #ifdef LOG_SVP
         elprintf(EL_SVP, "ssp PM%i DRAM r [%06x] %04x (inc %i)", reg, CADDR, dram[addr], inc >> 16);
 #endif
@@ -587,14 +584,14 @@ static u32 pm_io(int reg, int write, u32 d)
     return d;
   }
 
-  return (u32)-1;
+  return (uint32_t)-1;
 }
 
 // 8
-static u32 read_PM0(void)
+static uint32_t read_PM0(void)
 {
-  u32 d = pm_io(0, 0, 0);
-  if (d != (u32)-1) return d;
+  uint32_t d = pm_io(0, 0, 0);
+  if (d != (uint32_t)-1) return d;
 #ifdef LOG_SVP
   elprintf(EL_SVP, "PM0 raw r %04x @ %04x", rPM0, GET_PPC_OFFS());
 #endif
@@ -609,10 +606,10 @@ static u32 read_PM0(void)
   return d;
 }
 
-static void write_PM0(u32 d)
+static void write_PM0(uint32_t d)
 {
-  u32 r = pm_io(0, 1, d);
-  if (r != (u32)-1) return;
+  uint32_t r = pm_io(0, 1, d);
+  if (r != (uint32_t)-1) return;
 #ifdef LOG_SVP
   elprintf(EL_SVP, "PM0 raw w %04x @ %04x", d, GET_PPC_OFFS());
 #endif
@@ -620,10 +617,10 @@ static void write_PM0(u32 d)
 }
 
 // 9
-static u32 read_PM1(void)
+static uint32_t read_PM1(void)
 {
-  u32 d = pm_io(1, 0, 0);
-  if (d != (u32)-1) return d;
+  uint32_t d = pm_io(1, 0, 0);
+  if (d != (uint32_t)-1) return d;
   // can be removed?
 #ifdef LOG_SVP
   elprintf(EL_SVP|EL_ANOMALY, "PM1 raw r %04x @ %04x", rPM1, GET_PPC_OFFS());
@@ -631,10 +628,10 @@ static u32 read_PM1(void)
   return rPM1;
 }
 
-static void write_PM1(u32 d)
+static void write_PM1(uint32_t d)
 {
-  u32 r = pm_io(1, 1, d);
-  if (r != (u32)-1) return;
+  uint32_t r = pm_io(1, 1, d);
+  if (r != (uint32_t)-1) return;
   // can be removed?
 #ifdef LOG_SVP
   elprintf(EL_SVP|EL_ANOMALY, "PM1 raw w %04x @ %04x", d, GET_PPC_OFFS());
@@ -643,10 +640,10 @@ static void write_PM1(u32 d)
 }
 
 // 10
-static u32 read_PM2(void)
+static uint32_t read_PM2(void)
 {
-  u32 d = pm_io(2, 0, 0);
-  if (d != (u32)-1) return d;
+  uint32_t d = pm_io(2, 0, 0);
+  if (d != (uint32_t)-1) return d;
   // can be removed?
 #ifdef LOG_SVP
   elprintf(EL_SVP|EL_ANOMALY, "PM2 raw r %04x @ %04x", rPM2, GET_PPC_OFFS());
@@ -654,10 +651,10 @@ static u32 read_PM2(void)
   return rPM2;
 }
 
-static void write_PM2(u32 d)
+static void write_PM2(uint32_t d)
 {
-  u32 r = pm_io(2, 1, d);
-  if (r != (u32)-1) return;
+  uint32_t r = pm_io(2, 1, d);
+  if (r != (uint32_t)-1) return;
   // can be removed?
 #ifdef LOG_SVP
   elprintf(EL_SVP|EL_ANOMALY, "PM2 raw w %04x @ %04x", d, GET_PPC_OFFS());
@@ -666,22 +663,22 @@ static void write_PM2(u32 d)
 }
 
 // 11
-static u32 read_XST(void)
+static uint32_t read_XST(void)
 {
   // can be removed?
-  u32 d = pm_io(3, 0, 0);
-  if (d != (u32)-1) return d;
+  uint32_t d = pm_io(3, 0, 0);
+  if (d != (uint32_t)-1) return d;
 #ifdef LOG_SVP
   elprintf(EL_SVP, "XST raw r %04x @ %04x", rXST, GET_PPC_OFFS());
 #endif
   return rXST;
 }
 
-static void write_XST(u32 d)
+static void write_XST(uint32_t d)
 {
   // can be removed?
-  u32 r = pm_io(3, 1, d);
-  if (r != (u32)-1) return;
+  uint32_t r = pm_io(3, 1, d);
+  if (r != (uint32_t)-1) return;
 #ifdef LOG_SVP
   elprintf(EL_SVP, "XST raw w %04x @ %04x", d, GET_PPC_OFFS());
 #endif
@@ -690,9 +687,9 @@ static void write_XST(u32 d)
 }
 
 // 12
-static u32 read_PM4(void)
+static uint32_t read_PM4(void)
 {
-  u32 d = pm_io(4, 0, 0);
+  uint32_t d = pm_io(4, 0, 0);
   if (d == 0) {
     switch (GET_PPC_OFFS()) {
       case 0x0854:
@@ -709,7 +706,7 @@ static u32 read_PM4(void)
         break;
     }
   }
-  if (d != (u32)-1) return d;
+  if (d != (uint32_t)-1) return d;
   // can be removed?
 #ifdef LOG_SVP
   elprintf(EL_SVP|EL_ANOMALY, "PM4 raw r %04x @ %04x", rPM4, GET_PPC_OFFS());
@@ -717,10 +714,10 @@ static u32 read_PM4(void)
   return rPM4;
 }
 
-static void write_PM4(u32 d)
+static void write_PM4(uint32_t d)
 {
-  u32 r = pm_io(4, 1, d);
-  if (r != (u32)-1) return;
+  uint32_t r = pm_io(4, 1, d);
+  if (r != (uint32_t)-1) return;
   // can be removed?
 #ifdef LOG_SVP
   elprintf(EL_SVP|EL_ANOMALY, "PM4 raw w %04x @ %04x", d, GET_PPC_OFFS());
@@ -729,7 +726,7 @@ static void write_PM4(u32 d)
 }
 
 // 14
-static u32 read_PMC(void)
+static uint32_t read_PMC(void)
 {
 #ifdef LOG_SVP
   elprintf(EL_SVP, "PMC r a %04x (st %c) @ %04x", rPMC.h,
@@ -749,7 +746,7 @@ static u32 read_PMC(void)
   }
 }
 
-static void write_PMC(u32 d)
+static void write_PMC(uint32_t d)
 {
   if (ssp->emu_status & SSP_PMC_HAVE_ADDR) {
     //if (ssp->emu_status & SSP_PMC_SET)
@@ -772,7 +769,7 @@ static void write_PMC(u32 d)
 }
 
 // 15
-static u32 read_AL(void)
+static uint32_t read_AL(void)
 {
   if (*(PC-1) == 0x000f) {
 #ifdef LOG_SVP
@@ -783,14 +780,14 @@ static u32 read_AL(void)
   return rAL;
 }
 
-static void write_AL(u32 d)
+static void write_AL(uint32_t d)
 {
   rAL = d;
 }
 
 
-typedef u32 (*read_func_t)(void);
-typedef void (*write_func_t)(u32 d);
+typedef uint32_t (*read_func_t)(void);
+typedef void (*write_func_t)(uint32_t d);
 
 static read_func_t read_handlers[16] =
 {
@@ -833,11 +830,11 @@ static write_func_t write_handlers[16] =
 //
 #define ptr1_read(op) ptr1_read_(op&3,(op>>6)&4,(op<<1)&0x18)
 
-static u32 ptr1_read_(int ri, int isj2, int modi3)
+static uint32_t ptr1_read_(int32_t ri, int32_t isj2, int32_t modi3)
 {
   //int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
-  u32 mask, add = 0, t = ri | isj2 | modi3;
-  unsigned char *rp = NULL;
+  uint32_t mask, add = 0, t = ri | isj2 | modi3;
+  uint8_t *rp = NULL;
   switch (t)
   {
     // mod=0 (00)
@@ -894,9 +891,9 @@ modulo:
   return t;
 }
 
-static void ptr1_write(int op, u32 d)
+static void ptr1_write(int32_t op, uint32_t d)
 {
-  int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
+  int32_t t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
   switch (t)
   {
     // mod=0 (00)
@@ -939,9 +936,9 @@ static void ptr1_write(int op, u32 d)
   }
 }
 
-static u32 ptr2_read(int op)
+static uint32_t ptr2_read(int32_t op)
 {
-  int mv = 0, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
+  int32_t mv = 0, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
   switch (t)
   {
     // mod=0 (00)
@@ -966,7 +963,7 @@ static u32 ptr2_read(int op)
                return 0;
   }
 
-  return ((unsigned short *)svp->iram_rom)[mv];
+  return ((uint16_t  *)svp->iram_rom)[mv];
 }
 
 
@@ -1000,7 +997,7 @@ static void debug_dump(void)
 
 static void debug_dump_mem(void)
 {
-  int h, i;
+  int32_t h, i;
   printf("RAM0\n");
   for (h = 0; h < 32; h++)
   {
@@ -1012,11 +1009,11 @@ static void debug_dump_mem(void)
   }
 }
 
-static void debug_dump2file(const char *fname, void *mem, int len)
+static void debug_dump2file(const int8_t *fname, void *mem, int32_t len)
 {
   FILE *f = fopen(fname, "wb");
-  unsigned short *p = mem;
-  int i;
+  uint16_t *p = mem;
+  int32_t i;
   if (f) {
     for (i = 0; i < len/2; i++) p[i] = (p[i]<<8) | (p[i]>>8);
     fwrite(mem, 1, len, f);
@@ -1028,13 +1025,13 @@ static void debug_dump2file(const char *fname, void *mem, int len)
     printf("dump failed\n");
 }
 
-static int bpts[10] = { 0, };
+static int32_t bpts[10] = { 0, };
 
-static void debug(unsigned int pc, unsigned int op)
+static void debug(uint32_t pc, uint32_t op)
 {
-  static char buffo[64] = {0,};
-  char buff[64] = {0,};
-  int i;
+  static int8_t buffo[64] = {0,};
+  int8_t buff[64] = {0,};
+  int32_t i;
 
   if (running) {
     for (i = 0; i < 10; i++)
@@ -1084,15 +1081,15 @@ static void debug(unsigned int pc, unsigned int op)
 #endif // USE_DEBUGGER
 
 
-void ssp1601_run(int cycles)
+void ssp1601_run(int32_t cycles)
 {
   SET_PC(rPC);
   g_cycles = cycles;
 
   while (g_cycles > 0 && !(ssp->emu_status & SSP_WAIT_MASK))
   {
-    int op;
-    u32 tmpv;
+    int32_t op;
+    uint32_t tmpv;
 
     op = *PC++;
 #ifdef USE_DEBUGGER
@@ -1147,35 +1144,35 @@ void ssp1601_run(int cycles)
 
       // call cond, addr
       case 0x24: {
-        int cond = 0;
+        int32_t cond = 0;
         COND_CHECK
-        if (cond) { int new_PC = *PC++; write_STACK(GET_PC()); write_PC(new_PC); }
+        if (cond) { int32_t new_PC = *PC++; write_STACK(GET_PC()); write_PC(new_PC); }
         else PC++;
         break;
       }
 
       // ld d, (a)
-      case 0x25: tmpv = ((unsigned short *)svp->iram_rom)[rA]; REG_WRITE((op & 0xf0) >> 4, tmpv); break;
+      case 0x25: tmpv = ((uint16_t *)svp->iram_rom)[rA]; REG_WRITE((op & 0xf0) >> 4, tmpv); break;
 
       // bra cond, addr
       case 0x26: {
-        int cond = 0;
+        int32_t cond = 0;
         COND_CHECK
-        if (cond) { int new_PC = *PC++; write_PC(new_PC); }
+        if (cond) { int32_t new_PC = *PC++; write_PC(new_PC); }
         else PC++;
         break;
       }
 
       // mod cond, op
       case 0x48: {
-        int cond = 0;
+        int32_t cond = 0;
         COND_CHECK
         if (cond) {
           switch (op & 7) {
-            case 2: rA32 = (signed int)rA32 >> 1; break; // shr (arithmetic)
+            case 2: rA32 = (int32_t )rA32 >> 1; break; // shr (arithmetic)
             case 3: rA32 <<= 1; break; // shl
-            case 6: rA32 = -(signed int)rA32; break; // neg
-            case 7: if ((int)rA32 < 0) rA32 = -(signed int)rA32; break; // abs
+            case 6: rA32 = -(int32_t )rA32; break; // neg
+            case 7: if ((int32_t)rA32 < 0) rA32 = -(int32_t)rA32; break; // abs
             default:
 #ifdef LOG_SVP
               elprintf(EL_SVP|EL_ANOMALY, "ssp FIXME: unhandled mod %i @ %04x",

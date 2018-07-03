@@ -27,30 +27,30 @@
 
 typedef struct
 {
-  char consoletype[18];         /* Genesis or Mega Drive */
-  char copyright[18];           /* Copyright message */
-  char domestic[50];            /* Domestic name of ROM */
-  char international[50];       /* International name of ROM */
-  char ROMType[4];              /* Educational or Game */
-  char product[14];             /* Product serial number */
-  unsigned short checksum;      /* ROM Checksum (header) */
-  unsigned short realchecksum;  /* ROM Checksum (calculated) */
-  unsigned int romstart;        /* ROM start address */
-  unsigned int romend;          /* ROM end address */
-  char country[18];             /* Country flag */
-  uint16 peripherals;           /* Supported peripherals */
+  int8_t consoletype[18];         /* Genesis or Mega Drive */
+  int8_t copyright[18];           /* Copyright message */
+  int8_t domestic[50];            /* Domestic name of ROM */
+  int8_t international[50];       /* International name of ROM */
+  int8_t ROMType[4];              /* Educational or Game */
+  int8_t product[14];             /* Product serial number */
+  uint16_t checksum;      /* ROM Checksum (header) */
+  uint16_t realchecksum;  /* ROM Checksum (calculated) */
+  uint32_t romstart;        /* ROM start address */
+  uint32_t romend;          /* ROM end address */
+  uint8_t country[18];             /* Country flag */
+  uint16_t peripherals;           /* Supported peripherals */
 } ROMINFO;
 
 
 /* Global variables */
 extern ROMINFO rominfo;
-extern char rom_filename[256];
+extern int8_t rom_filename[256];
 
 /* Function prototypes */
-extern int load_rom(char *filename);
+extern int32_t load_rom(int8_t *filename);
 extern void region_autodetect(void);
-extern char *get_company(void);
-extern char *get_peripheral(int index);
+extern int8_t *get_company(void);
+extern int8_t *get_peripheral(int32_t index);
 
 #endif /* _LOADROM_H_ */
 

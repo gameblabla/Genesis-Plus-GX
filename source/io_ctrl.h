@@ -30,16 +30,16 @@
 #define REGION_EUROPE     0xC0
 
 /* Global variables */
-extern uint8 io_reg[0x10];
-extern uint8 region_code;
+extern uint8_t io_reg[0x10];
+extern uint8_t region_code;
 
 /* Function prototypes */
 extern void io_init(void);
 extern void io_reset(void);
-extern void io_68k_write(unsigned int offset, unsigned int data);
-extern unsigned int io_68k_read(unsigned int offset);
-extern void io_z80_write(unsigned int data);
-extern unsigned int io_z80_read(unsigned int offset);
+extern void io_68k_write(uint32_t offset, uint32_t data);
+extern uint32_t io_68k_read(uint32_t offset);
+extern void io_z80_write(uint32_t data);
+extern uint32_t io_z80_read(uint32_t offset);
 
 #endif /* _IO_H_ */
 

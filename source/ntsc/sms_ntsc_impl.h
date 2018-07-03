@@ -81,7 +81,7 @@ static void init_filters( init_t* impl, sms_ntsc_setup_t const* setup )
     float const maxh = 32;
     float const pow_a_n = (float) pow( rolloff, maxh );
     float sum;
-    int i;
+    int32_t i;
     /* quadratic mapping to reduce negative (blurring) range */
     float to_angle = (float) setup->resolution + 1;
     to_angle = PI / maxh * (float) LUMA_CUTOFF * (to_angle * to_angle + 1);
@@ -89,7 +89,7 @@ static void init_filters( init_t* impl, sms_ntsc_setup_t const* setup )
     kernels [kernel_size * 3 / 2] = maxh; /* default center value */
     for ( i = 0; i < kernel_half * 2 + 1; i++ )
     {
-      int x = i - kernel_half;
+      int32_t x = i - kernel_half;
       float angle = x * to_angle;
       /* instability occurs at center point with rolloff very close to 1.0 */
       if ( x || pow_a_n > (float) 1.056 || pow_a_n < (float) 0.981 )
@@ -117,7 +117,7 @@ static void init_filters( init_t* impl, sms_ntsc_setup_t const* setup )
     sum = 1.0f / sum;
     for ( i = 0; i < kernel_half * 2 + 1; i++ )
     {
-      int x = kernel_size * 3 / 2 - kernel_half + i;
+      int32_t x = kernel_size * 3 / 2 - kernel_half + i;
       kernels [x] *= sum;
       assert( kernels [x] == kernels [x] ); /* catch numerical instability */
     }
@@ -127,7 +127,7 @@ static void init_filters( init_t* impl, sms_ntsc_setup_t const* setup )
   {
     float const cutoff_factor = -0.03125f;
     float cutoff = (float) setup->bleed;
-    int i;
+    int32_t i;
     
     if ( cutoff < 0 )
     {
@@ -146,7 +146,7 @@ static void init_filters( init_t* impl, sms_ntsc_setup_t const* setup )
     for ( i = 0; i < 2; i++ )
     {
       float sum = 0;
-      int x;
+      int32_t x;
       for ( x = i; x < kernel_size; x += 2 )
         sum += kernels [x];
       
@@ -173,11 +173,11 @@ static void init_filters( init_t* impl, sms_ntsc_setup_t const* setup )
   {
     float weight = 1.0f;
     float* out = impl->kernel;
-    int n = rescale_out;
+    int32_t n = rescale_out;
     do
     {
       float remain = 0;
-      int i;
+      int32_t i;
       weight -= 1.0f / rescale_in;
       for ( i = 0; i < kernel_size * 2; i++ )
       {
@@ -222,7 +222,7 @@ static void init( init_t* impl, sms_ntsc_setup_t const* setup )
     float const to_float = 1.0f / (gamma_size - (gamma_size > 1));
     float const gamma = 1.1333f - (float) setup->gamma * 0.5f;
     /* match common PC's 2.2 gamma to TV's 2.65 gamma */
-    int i;
+    int32_t i;
     for ( i = 0; i < gamma_size; i++ )
       impl->to_float [i] =
           (float) pow( i * to_float, gamma ) * impl->contrast + impl->brightness;
@@ -244,13 +244,13 @@ static void init( init_t* impl, sms_ntsc_setup_t const* setup )
       float s = (float) sin( hue ) * sat;
       float c = (float) cos( hue ) * sat;
       float* out = impl->to_rgb;
-      int n;
+      int32_t n;
       
       n = burst_count;
       do
       {
         float const* in = decoder;
-        int n = 3;
+        int32_t n = 3;
         do
         {
           float i = *in++;
@@ -289,7 +289,7 @@ enum { rgb_bias = rgb_unit * 2 * sms_ntsc_rgb_builder };
 
 typedef struct pixel_info_t
 {
-  int offset;
+  int32_t offset;
   float negate;
   float kernel [4];
 } pixel_info_t;
@@ -316,7 +316,7 @@ static void gen_kernel( init_t* impl, float y, float i, float q, sms_ntsc_rgb_t*
 {
   /* generate for each scanline burst phase */
   float const* to_rgb = impl->to_rgb;
-  int burst_remain = burst_count;
+  int32_t burst_remain = burst_count;
   y -= rgb_offset;
   do
   {
@@ -325,7 +325,7 @@ static void gen_kernel( init_t* impl, float y, float i, float q, sms_ntsc_rgb_t*
     sharpening, and rescale horizontally. Convert resulting yiq to rgb and pack
     into integer. Based on algorithm by NewRisingSun. */
     pixel_info_t const* pixel = sms_ntsc_pixels;
-    int alignment_remain = alignment_count;
+    int32_t alignment_remain = alignment_count;
     do
     {
       /* negate is -1 when composite starts at odd multiple of 2 */
@@ -345,7 +345,7 @@ static void gen_kernel( init_t* impl, float y, float i, float q, sms_ntsc_rgb_t*
       float const yc3 = (y - qq) * pixel->kernel [3];
       
       float const* k = &impl->kernel [pixel->offset];
-      int n;
+      int32_t n;
       ++pixel;
       for ( n = rgb_kernel_size; n; --n )
       {
@@ -397,12 +397,12 @@ static void correct_errors( sms_ntsc_rgb_t color, sms_ntsc_rgb_t* out );
 
 #define RGB_PALETTE_OUT( rgb, out_ )\
 {\
-  unsigned char* out = (out_);\
+  uint8_t* out = (out_);\
   sms_ntsc_rgb_t clamped = (rgb);\
   SMS_NTSC_CLAMP_( clamped, (8 - rgb_bits) );\
-  out [0] = (unsigned char) (clamped >> 21);\
-  out [1] = (unsigned char) (clamped >> 11);\
-  out [2] = (unsigned char) (clamped >>  1);\
+  out [0] = (uint8_t) (clamped >> 21);\
+  out [1] = (uint8_t) (clamped >> 11);\
+  out [2] = (uint8_t) (clamped >>  1);\
 }
 
 /* blitter related */
@@ -422,16 +422,16 @@ static void correct_errors( sms_ntsc_rgb_t color, sms_ntsc_rgb_t* out );
 
 #if SMS_NTSC_OUT_DEPTH <= 16
   #if USHRT_MAX == 0xFFFF
-    typedef unsigned short sms_ntsc_out_t;
+    typedef uint16_t sms_ntsc_out_t;
   #else
     #error "Need 16-bit int type"
   #endif
 
 #else
   #if UINT_MAX == 0xFFFFFFFF
-    typedef unsigned int  sms_ntsc_out_t;
+    typedef uint32_t  sms_ntsc_out_t;
   #elif ULONG_MAX == 0xFFFFFFFF
-    typedef unsigned long sms_ntsc_out_t;
+    typedef uint32_t sms_ntsc_out_t;
   #else
     #error "Need 32-bit int type"
   #endif

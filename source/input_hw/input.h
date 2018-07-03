@@ -108,17 +108,17 @@
 
 typedef struct
 {
-  uint8 system[2];              /* can be one of the SYSTEM_* values */
-  uint8 dev[MAX_DEVICES];       /* can be one of the DEVICE_* values */
-  uint16 pad[MAX_DEVICES];      /* digital inputs (any of INPUT_* values)  */
-  int16 analog[MAX_DEVICES][2]; /* analog inputs (x/y) */
-  uint8 x_offset;               /* gun horizontal offset */
-  uint8 y_offset;               /* gun vertical offset */
+  uint8_t system[2];              /* can be one of the SYSTEM_* values */
+  uint8_t dev[MAX_DEVICES];       /* can be one of the DEVICE_* values */
+  uint16_t pad[MAX_DEVICES];      /* digital inputs (any of INPUT_* values)  */
+  int16_t analog[MAX_DEVICES][2]; /* analog inputs (x/y) */
+  uint8_t x_offset;               /* gun horizontal offset */
+  uint8_t y_offset;               /* gun vertical offset */
 } t_input;
 
 /* Global variables */
 extern t_input input;
-extern int old_system[2];
+extern int32_t old_system[2];
 
 /* Function prototypes */
 extern void input_init(void);

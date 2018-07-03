@@ -39,43 +39,43 @@ extern sms_ntsc_t *sms_ntsc;
 #undef READ_LONG
 #undef WRITE_LONG
 
-static __inline__ uint32 READ_LONG(void *address)
+static __inline__ uint32_t READ_LONG(void *address)
 {
   if ((uint32)address & 3)
   {
 #ifdef LSB_FIRST  /* little endian version */
-    return ( *((uint8 *)address) +
-        (*((uint8 *)address+1) << 8)  +
-        (*((uint8 *)address+2) << 16) +
-        (*((uint8 *)address+3) << 24) );
+    return ( *((uint8_t *)address) +
+        (*((uint8_t *)address+1) << 8)  +
+        (*((uint8_t *)address+2) << 16) +
+        (*((uint8_t *)address+3) << 24) );
 #else       /* big endian version */
-    return ( *((uint8 *)address+3) +
-        (*((uint8 *)address+2) << 8)  +
-        (*((uint8 *)address+1) << 16) +
-        (*((uint8 *)address)   << 24) );
+    return ( *((uint8_t *)address+3) +
+        (*((uint8_t *)address+2) << 8)  +
+        (*((uint8_t *)address+1) << 16) +
+        (*((uint8_t *)address)   << 24) );
 #endif  /* LSB_FIRST */
   }
-  else return *(uint32 *)address;
+  else return *(uint32_t *)address;
 }
 
-static __inline__ void WRITE_LONG(void *address, uint32 data)
+static __inline__ void WRITE_LONG(void *address, uint32_t data)
 {
   if ((uint32)address & 3)
   {
 #ifdef LSB_FIRST
-      *((uint8 *)address) =  data;
-      *((uint8 *)address+1) = (data >> 8);
-      *((uint8 *)address+2) = (data >> 16);
-      *((uint8 *)address+3) = (data >> 24);
+      *((uint8_t *)address) =  data;
+      *((uint8_t *)address+1) = (data >> 8);
+      *((uint8_t *)address+2) = (data >> 16);
+      *((uint8_t *)address+3) = (data >> 24);
 #else
-      *((uint8 *)address+3) =  data;
-      *((uint8 *)address+2) = (data >> 8);
-      *((uint8 *)address+1) = (data >> 16);
-      *((uint8 *)address)   = (data >> 24);
+      *((uint8_t *)address+3) =  data;
+      *((uint8_t *)address+2) = (data >> 8);
+      *((uint8_t *)address+1) = (data >> 16);
+      *((uint8_t *)address)   = (data >> 24);
 #endif /* LSB_FIRST */
     return;
   }
-  else *(uint32 *)address = data;
+  else *(uint32_t *)address = data;
 }
 
 #endif  /* ALIGN_LONG */
@@ -93,10 +93,10 @@ static __inline__ void WRITE_LONG(void *address, uint32 data)
 */
 #define GET_LSB_TILE(ATTR, LINE) \
   atex = atex_table[(ATTR >> 13) & 7]; \
-  src = (uint32 *)&bg_pattern_cache[(ATTR & 0x00001FFF) << 6 | (LINE)];
+  src = (uint32_t *)&bg_pattern_cache[(ATTR & 0x00001FFF) << 6 | (LINE)];
 #define GET_MSB_TILE(ATTR, LINE) \
   atex = atex_table[(ATTR >> 29) & 7]; \
-  src = (uint32 *)&bg_pattern_cache[(ATTR & 0x1FFF0000) >> 10 | (LINE)];
+  src = (uint32_t *)&bg_pattern_cache[(ATTR & 0x1FFF0000) >> 10 | (LINE)];
 
 /* Draw 2-cell column (16 pixels high) */
 /*
@@ -110,10 +110,10 @@ static __inline__ void WRITE_LONG(void *address, uint32 data)
 */
 #define GET_LSB_TILE_IM2(ATTR, LINE) \
   atex = atex_table[(ATTR >> 13) & 7]; \
-  src = (uint32 *)&bg_pattern_cache[((ATTR & 0x000003FF) << 7 | (ATTR & 0x00001800) << 6 | (LINE)) ^ ((ATTR & 0x00001000) >> 6)];
+  src = (uint32_t *)&bg_pattern_cache[((ATTR & 0x000003FF) << 7 | (ATTR & 0x00001800) << 6 | (LINE)) ^ ((ATTR & 0x00001000) >> 6)];
 #define GET_MSB_TILE_IM2(ATTR, LINE) \
   atex = atex_table[(ATTR >> 29) & 7]; \
-  src = (uint32 *)&bg_pattern_cache[((ATTR & 0x03FF0000) >> 9 | (ATTR & 0x18000000) >> 10 | (LINE)) ^ ((ATTR & 0x10000000) >> 22)];
+  src = (uint32_t *)&bg_pattern_cache[((ATTR & 0x03FF0000) >> 9 | (ATTR & 0x18000000) >> 10 | (LINE)) ^ ((ATTR & 0x10000000) >> 22)];
 
 /*   
    One column = 2 tiles
@@ -254,63 +254,63 @@ static __inline__ void WRITE_LONG(void *address, uint32 data)
 #ifdef LSB_FIRST 
 #define DRAW_BG_COLUMN(ATTR, LINE, SRC_A, SRC_B) \
   GET_LSB_TILE(ATTR, LINE) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
   GET_MSB_TILE(ATTR, LINE) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B)
 #define DRAW_BG_COLUMN_IM2(ATTR, LINE, SRC_A, SRC_B) \
   GET_LSB_TILE_IM2(ATTR, LINE) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
   GET_MSB_TILE_IM2(ATTR, LINE) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B)
 #else
 #define DRAW_BG_COLUMN(ATTR, LINE, SRC_A, SRC_B) \
   GET_MSB_TILE(ATTR, LINE) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
   GET_LSB_TILE(ATTR, LINE) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) 
 #define DRAW_BG_COLUMN_IM2(ATTR, LINE, SRC_A, SRC_B) \
   GET_MSB_TILE_IM2(ATTR, LINE) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
   GET_LSB_TILE_IM2(ATTR, LINE) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = READ_LONG((uint32 *)lb); \
+  SRC_A = READ_LONG((uint32_t *)lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B)
 #endif
@@ -318,63 +318,63 @@ static __inline__ void WRITE_LONG(void *address, uint32 data)
 #ifdef LSB_FIRST 
 #define DRAW_BG_COLUMN(ATTR, LINE, SRC_A, SRC_B) \
   GET_LSB_TILE(ATTR, LINE) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
   GET_MSB_TILE(ATTR, LINE) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B)
 #define DRAW_BG_COLUMN_IM2(ATTR, LINE, SRC_A, SRC_B) \
   GET_LSB_TILE_IM2(ATTR, LINE) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
   GET_MSB_TILE_IM2(ATTR, LINE) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B)
 #else
 #define DRAW_BG_COLUMN(ATTR, LINE, SRC_A, SRC_B) \
   GET_MSB_TILE(ATTR, LINE) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
   GET_LSB_TILE(ATTR, LINE) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B)
 #define DRAW_BG_COLUMN_IM2(ATTR, LINE, SRC_A, SRC_B) \
   GET_MSB_TILE_IM2(ATTR, LINE) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
   GET_LSB_TILE_IM2(ATTR, LINE) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[0] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B) \
-  SRC_A = *(uint32 *)(lb); \
+  SRC_A = *(uint32_t *)(lb); \
   SRC_B = (src[1] | atex); \
   DRAW_BG_TILE(SRC_A, SRC_B)
 #endif
@@ -412,13 +412,13 @@ static __inline__ void WRITE_LONG(void *address, uint32 data)
 /* Window & Plane A clipping */
 static struct clip_t
 {
-  uint8 left;
-  uint8 right;
-  uint8 enable;
+  uint8_t left;
+  uint8_t right;
+  uint8_t enable;
 } clip[2];
 
 /* Pattern attribute (priority + palette bits) expansion table */
-static const uint32 atex_table[] =
+static const uint32_t atex_table[] =
 {
   0x00000000,
   0x10101010,
@@ -431,63 +431,63 @@ static const uint32 atex_table[] =
 };
 
 /* Sprite pattern name offset look-up table (Mode 5) */
-static uint8 name_lut[0x400];
+static uint8_t name_lut[0x400];
 
 /* Bitplane to packed pixel look-up table (Mode 4) */
-static uint32 bp_lut[0x10000];
+static uint32_t bp_lut[0x10000];
 
 /* Layer priority pixel look-up tables */
-static uint8 lut[LUT_MAX][LUT_SIZE];
+static uint8_t lut[LUT_MAX][LUT_SIZE];
 
 #ifdef NGC
 /* 16-bit pixel color mapping */
-static uint16 pixel[0x100];
-static uint16 pixel_lut[3][0x200];
-static uint16 pixel_lut_m4[0x40];
+static uint16_t pixel[0x100];
+static uint16_t pixel_lut[3][0x200];
+static uint16_t pixel_lut_m4[0x40];
 #else
 /* 8-bit pixel color mapping */
-static uint8 pixel_8[0x100];
-static uint8 pixel_8_lut[3][0x200];
-static uint8 pixel_8_lut_m4[0x40];
+static uint8_t pixel_8[0x100];
+static uint8_t pixel_8_lut[3][0x200];
+static uint8_t pixel_8_lut_m4[0x40];
 /* 15-bit pixel color mapping */
-static uint16 pixel_15[0x100];
-static uint16 pixel_15_lut[3][0x200];
-static uint16 pixel_15_lut_m4[0x40];
+static uint16_t pixel_15[0x100];
+static uint16_t pixel_15_lut[3][0x200];
+static uint16_t pixel_15_lut_m4[0x40];
 /* 16-bit pixel color mapping */
-static uint16 pixel_16[0x100];
-static uint16 pixel_16_lut[3][0x200];
-static uint16 pixel_16_lut_m4[0x40];
+static uint16_t pixel_16[0x100];
+static uint16_t pixel_16_lut[3][0x200];
+static uint16_t pixel_16_lut_m4[0x40];
 /* 32-bit pixel color mapping */
-static uint32 pixel_32[0x100];
-static uint32 pixel_32_lut[3][0x200];
-static uint32 pixel_32_lut_m4[0x40];
+static uint32_t pixel_32[0x100];
+static uint32_t pixel_32_lut[3][0x200];
+static uint32_t pixel_32_lut_m4[0x40];
 #endif
 
 /* Background & Sprite line buffers */
-static uint8 linebuf[2][0x200];
+static uint8_t linebuf[2][0x200];
 
 /* Sprite limit flag */
-static int spr_over = 0;
+static int32_t spr_over = 0;
 
 /* Sprites parsing */
 static struct 
 {
-  uint16 ypos;
-  uint16 xpos;
-  uint16 attr;
-  uint16 size;
+  uint16_t ypos;
+  uint16_t xpos;
+  uint16_t attr;
+  uint16_t size;
 } object_info[20];
 
-uint8 object_count;
+uint8_t object_count;
 
 /* Function pointers */
-void (*render_bg)(int line, int width);
-void (*render_obj)(int max_width);
-void (*parse_satb)(int line);
-void (*update_bg_pattern_cache)(int index);
+void (*render_bg)(int32_t line, int32_t width);
+void (*render_obj)(int32_t max_width);
+void (*parse_satb)(int32_t line);
+void (*update_bg_pattern_cache)(int32_t index);
 
 #ifndef NGC
-void (*color_update)(int index, unsigned int data);
+void (*color_update)(int32_t index, uint32_t data);
 #endif
 
 
@@ -497,10 +497,10 @@ void (*color_update)(int index, unsigned int data);
 
 static void make_name_lut(void)
 {
-  int vcol, vrow;
-  int width, height;
-  int flipx, flipy;
-  int i;
+  int32_t vcol, vrow;
+  int32_t width, height;
+  int32_t flipx, flipy;
+  int32_t i;
 
   for (i = 0; i < 0x400; i += 1)
   {
@@ -536,8 +536,8 @@ static void make_name_lut(void)
 
 static void make_bp_lut(void)
 {
-  int x,i,j;
-  uint32 out;
+  int32_t x,i,j;
+  uint32_t out;
 
   /* ---------------------- */
   /* Pattern color encoding */
@@ -559,8 +559,8 @@ static void make_bp_lut(void)
     {
       /* pixel line data = hh00gg00ff00ee00dd00cc00bb00aa00 (32-bit) */
       /* aa-hh = upper or lower 2-bit values of pixels 0-7 (shifted) */
-      out |= (j & (0x80 >> x)) ? (uint32)(8 << (x << 2)) : 0;
-      out |= (i & (0x80 >> x)) ? (uint32)(4 << (x << 2)) : 0;
+      out |= (j & (0x80 >> x)) ? (uint32_t)(8 << (x << 2)) : 0;
+      out |= (i & (0x80 >> x)) ? (uint32_t)(4 << (x << 2)) : 0;
     }
 
     /* i = low byte in VRAM  (bp0 or bp2) */
@@ -581,17 +581,17 @@ static void make_bp_lut(void)
 /* Input (bx):  d5-d0=color, d6=priority, d7=unused */
 /* Input (ax):  d5-d0=color, d6=priority, d7=unused */
 /* Output:    d5-d0=color, d6=priority, d7=zero */
-static uint32 make_lut_bg(uint32 bx, uint32 ax)
+static uint32_t make_lut_bg(uint32_t bx, uint32_t ax)
 {
-  int bf = (bx & 0x7F);
-  int bp = (bx & 0x40);
-  int b  = (bx & 0x0F);
+  int32_t bf = (bx & 0x7F);
+  int32_t bp = (bx & 0x40);
+  int32_t b  = (bx & 0x0F);
   
-  int af = (ax & 0x7F);   
-  int ap = (ax & 0x40);
-  int a  = (ax & 0x0F);
+  int32_t af = (ax & 0x7F);   
+  int32_t ap = (ax & 0x40);
+  int32_t a  = (ax & 0x0F);
 
-  int c = (ap ? (a ? af : bf) : (bp ? (b ? bf : af) : (a ? af : bf)));
+  int32_t c = (ap ? (a ? af : bf) : (bp ? (b ? bf : af) : (a ? af : bf)));
 
   /* Strip palette & priority bits from transparent pixels */
   if((c & 0x0F) == 0x00) c &= 0x80;
@@ -602,17 +602,17 @@ static uint32 make_lut_bg(uint32 bx, uint32 ax)
 /* Input (bx):  d5-d0=color, d6=priority, d7=unused */
 /* Input (sx):  d5-d0=color, d6=priority, d7=unused */
 /* Output:    d5-d0=color, d6=priority, d7=intensity select (0=half/1=normal) */
-static uint32 make_lut_bg_ste(uint32 bx, uint32 ax)
+static uint32_t make_lut_bg_ste(uint32_t bx, uint32_t ax)
 {
-  int bf = (bx & 0x7F);
-  int bp = (bx & 0x40);
-  int b  = (bx & 0x0F);
+  int32_t bf = (bx & 0x7F);
+  int32_t bp = (bx & 0x40);
+  int32_t b  = (bx & 0x0F);
   
-  int af = (ax & 0x7F);   
-  int ap = (ax & 0x40);
-  int a  = (ax & 0x0F);
+  int32_t af = (ax & 0x7F);   
+  int32_t ap = (ax & 0x40);
+  int32_t a  = (ax & 0x0F);
 
-  int c = (ap ? (a ? af : bf) : (bp ? (b ? bf : af) : (a ? af : bf)));
+  int32_t c = (ap ? (a ? af : bf) : (bp ? (b ? bf : af) : (a ? af : bf)));
 
   /* Half intensity when both pixels are low priority */
   c |= ((ap | bp) << 1);
@@ -626,15 +626,15 @@ static uint32 make_lut_bg_ste(uint32 bx, uint32 ax)
 /* Input (bx):  d5-d0=color, d6=priority/1, d7=sprite pixel marker */
 /* Input (sx):  d5-d0=color, d6=priority, d7=unused */
 /* Output:    d5-d0=color, d6=priority, d7=sprite pixel marker */
-static uint32 make_lut_obj(uint32 bx, uint32 sx)
+static uint32_t make_lut_obj(uint32_t bx, uint32_t sx)
 {
-  int bf = (bx & 0x7F);
-  int bs = (bx & 0x80);
-  int sf = (sx & 0x7F);
+  int32_t bf = (bx & 0x7F);
+  int32_t bs = (bx & 0x80);
+  int32_t sf = (sx & 0x7F);
 
   if((sx & 0x0F) == 0) return bx;
 
-  int c = (bs ? bf : sf);
+  int32_t c = (bs ? bf : sf);
 
   /* Strip palette bits from transparent pixels */
   if((c & 0x0F) == 0x00) c &= 0xC0;
@@ -646,23 +646,23 @@ static uint32 make_lut_obj(uint32 bx, uint32 sx)
 /* Input (bx):  d5-d0=color, d6=priority, d7=opaque sprite pixel marker */
 /* Input (sx):  d5-d0=color, d6=priority, d7=unused */
 /* Output:    d5-d0=color, d6=zero/priority, d7=opaque sprite pixel marker */
-static uint32 make_lut_bgobj(uint32 bx, uint32 sx)
+static uint32_t make_lut_bgobj(uint32_t bx, uint32_t sx)
 {
-  int bf = (bx & 0x3F);
-  int bs = (bx & 0x80);
-  int bp = (bx & 0x40);
-  int b  = (bx & 0x0F);
+  int32_t bf = (bx & 0x3F);
+  int32_t bs = (bx & 0x80);
+  int32_t bp = (bx & 0x40);
+  int32_t b  = (bx & 0x0F);
   
-  int sf = (sx & 0x3F);
-  int sp = (sx & 0x40);
-  int s  = (sx & 0x0F);
+  int32_t sf = (sx & 0x3F);
+  int32_t sp = (sx & 0x40);
+  int32_t s  = (sx & 0x0F);
 
   if(s == 0) return bx;
 
   /* Previous sprite has higher priority */
   if(bs) return bx;
 
-  int c = (sp ? sf : (bp ? (b ? bf : sf) : sf));
+  int32_t c = (sp ? sf : (bp ? (b ? bf : sf) : sf));
 
   /* Strip palette & priority bits from transparent pixels */
   if((c & 0x0F) == 0x00) c &= 0x80;
@@ -673,19 +673,19 @@ static uint32 make_lut_bgobj(uint32 bx, uint32 sx)
 /* Input (bx):  d5-d0=color, d6=priority, d7=intensity (half/normal) */
 /* Input (sx):  d5-d0=color, d6=priority, d7=sprite marker */
 /* Output:    d5-d0=color, d6=intensity (half/normal), d7=(double/invalid) */
-static uint32 make_lut_bgobj_ste(uint32 bx, uint32 sx)
+static uint32_t make_lut_bgobj_ste(uint32_t bx, uint32_t sx)
 {
-  int c;
+  int32_t c;
 
-  int bf = (bx & 0x3F);
-  int bp = (bx & 0x40);
-  int b  = (bx & 0x0F);
-  int bi = (bx & 0x80) >> 1;
+  int32_t bf = (bx & 0x3F);
+  int32_t bp = (bx & 0x40);
+  int32_t b  = (bx & 0x0F);
+  int32_t bi = (bx & 0x80) >> 1;
 
-  int sf = (sx & 0x3F);
-  int sp = (sx & 0x40);
-  int s  = (sx & 0x0F);
-  int si = sp | bi;
+  int32_t sf = (sx & 0x3F);
+  int32_t sp = (sx & 0x40);
+  int32_t s  = (sx & 0x0F);
+  int32_t si = sp | bi;
 
   if(sp)
   {
@@ -802,22 +802,22 @@ static uint32 make_lut_bgobj_ste(uint32 bx, uint32 sx)
 /* Input (bx):  d3-d0=color, d4=palette, d5=priority, d6=zero, d7=sprite pixel marker */
 /* Input (sx):  d3-d0=color, d7-d4=zero */
 /* Output:      d3-d0=color, d4=palette, d5=zero/priority, d6=zero, d7=sprite pixel marker */
-static uint32 make_lut_bgobj_m4(uint32 bx, uint32 sx)
+static uint32_t make_lut_bgobj_m4(uint32_t bx, uint32_t sx)
 {
-  int bf = (bx & 0x3F);
-  int bs = (bx & 0x80);
-  int bp = (bx & 0x20);
-  int b  = (bx & 0x0F);
+  int32_t bf = (bx & 0x3F);
+  int32_t bs = (bx & 0x80);
+  int32_t bp = (bx & 0x20);
+  int32_t b  = (bx & 0x0F);
 
-  int s  = (sx & 0x0F);
-  int sf = (s | 0x10); /* force palette bit */
+  int32_t s  = (sx & 0x0F);
+  int32_t sf = (s | 0x10); /* force palette bit */
 
   if(s == 0) return bx;
 
   /* Previous sprite has higher priority */
   if(bs) return bx;
 
-  int c = (bp ? (b ? bf : sf) : sf);
+  int32_t c = (bp ? (b ? bf : sf) : sf);
 
   return (c | 0x80);
 }
@@ -827,7 +827,7 @@ static uint32 make_lut_bgobj_m4(uint32 bx, uint32 sx)
 /* Pixel layer merging function                                             */
 /*--------------------------------------------------------------------------*/
 
-static inline void merge(uint8 *srca, uint8 *srcb, uint8 *dst, uint8 *table, int width)
+static inline void merge(uint8_t *srca, uint8_t *srcb, uint8_t *dst, uint8_t *table, int32_t width)
 {
   do
   {
@@ -843,7 +843,7 @@ static inline void merge(uint8 *srca, uint8 *srcb, uint8 *dst, uint8 *table, int
 /* Pixel color mapping functions                                            */
 /*--------------------------------------------------------------------------*/
 
-static inline void remap_8(uint8 *src, uint8 *dst, int length)
+static inline void remap_8(uint8_t *src, uint8_t *dst, int32_t length)
 {
   do
   {
@@ -852,7 +852,7 @@ static inline void remap_8(uint8 *src, uint8 *dst, int length)
   while (--length);
 }
 
-static inline void remap_16(uint8 *src, uint16 *dst, int length)
+static inline void remap_16(uint8_t *src, uint16_t *dst, int32_t length)
 {
   do
   {
@@ -861,7 +861,7 @@ static inline void remap_16(uint8 *src, uint16 *dst, int length)
   while (--length);
 }
 
-static inline void remap_32(uint8 *src, uint32 *dst, int length)
+static inline void remap_32(uint8_t *src, uint32_t *dst, int32_t length)
 {
   do
   {
@@ -879,7 +879,7 @@ static inline void remap_32(uint8 *src, uint32 *dst, int length)
 
 static void palette_init(void)
 {
-  int r, g, b, i;
+  int32_t r, g, b, i;
 
   /************************************************/
   /* Each R,G,B color channel is 4-bit with a     */
@@ -964,7 +964,7 @@ static void palette_init(void)
 
 #ifndef NGC
 
-static void color_update_8(int index, unsigned int data)
+static void color_update_8(int32_t index, uint32_t data)
 {
   /* Mode 5 */
   if (reg[1] & 4)
@@ -1017,7 +1017,7 @@ static void color_update_8(int index, unsigned int data)
   }
 }
 
-static void color_update_15(int index, unsigned int data)
+static void color_update_15(int32_t index, uint32_t data)
 {
   /* Mode 5 */
   if (reg[1] & 4)
@@ -1070,7 +1070,7 @@ static void color_update_15(int index, unsigned int data)
   }
 }
 
-static void color_update_16(int index, unsigned int data)
+static void color_update_16(int32_t index, uint32_t data)
 {
   /* Mode 5 */
   if (reg[1] & 4)
@@ -1123,7 +1123,7 @@ static void color_update_16(int index, unsigned int data)
   }
 }
 
-static void color_update_32(int index, unsigned int data)
+static void color_update_32(int32_t index, uint32_t data)
 {
   /* Mode 5 */
   if (reg[1] & 4)
@@ -1178,7 +1178,7 @@ static void color_update_32(int index, unsigned int data)
 
 #else
 
-void color_update(int index, unsigned int data)
+void color_update(int32_t index, uint32_t data)
 {
   /* Mode 5 */
   if (reg[1] & 4)
@@ -1239,23 +1239,23 @@ void color_update(int index, unsigned int data)
 /* Background layers rendering functions                                    */
 /*--------------------------------------------------------------------------*/
 
-void render_bg_m4(int line, int width)
+void render_bg_m4(int32_t line, int32_t width)
 {
-  int column;
-  uint32 attr, atex, *src;
+  int32_t column;
+  uint32_t attr, atex, *src;
 
   /* Horizontal scrolling */
-  int index = ((reg[0] & 0x40) && (line < 0x10)) ? 0x100 : hscroll;
-  int shift = index & 7;
+  int32_t index = ((reg[0] & 0x40) && (line < 0x10)) ? 0x100 : hscroll;
+  int32_t shift = index & 7;
 
   /* Background line buffer */
-  uint32 *dst = (uint32 *)&linebuf[0][0x20 + shift];
+  uint32_t *dst = (uint32_t *)&linebuf[0][0x20 + shift];
 
   /* Vertical scrolling */
-  int v_line = (line + vscroll) % 224;
+  int32_t v_line = (line + vscroll) % 224;
 
   /* Pattern name table */
-  uint16 *nt = (uint16 *)&vram[((reg[2] << 10) & 0x3800) + ((v_line >> 3) << 6)];
+  uint16_t *nt = (uint16_t *)&vram[((reg[2] << 10) & 0x3800) + ((v_line >> 3) << 6)];
 
   /* Pattern row index */
   v_line = (v_line & 7) << 3;
@@ -1280,7 +1280,7 @@ void render_bg_m4(int line, int width)
     if((column == 24) && (reg[0] & 0x80))
     {
       /* Clear name table base */
-      nt = (uint16 *)&vram[((reg[2] << 10) & 0x3800) + ((line >> 3) << 6)];
+      nt = (uint16_t *)&vram[((reg[2] << 10) & 0x3800) + ((line >> 3) << 6)];
 
       /* Clear Pattern row index */
       v_line = (line & 7) << 3;
@@ -1296,7 +1296,7 @@ void render_bg_m4(int line, int width)
     atex = atex_table[(attr >> 11) & 3];
 
     /* Cached pattern data line (4 bytes = 4 pixels at once) */
-    src = (uint32 *)&bg_pattern_cache[((attr & 0x7FF) << 6) | (v_line)];
+    src = (uint32_t *)&bg_pattern_cache[((attr & 0x7FF) << 6) | (v_line)];
 
     /* Copy left & right half, adding the attribute bits in */
 #ifdef ALIGN_DWORD
@@ -1315,32 +1315,32 @@ void render_bg_m4(int line, int width)
 }
 
 #ifndef ALT_RENDERER
-void render_bg_m5(int line, int width)
+void render_bg_m5(int32_t line, int32_t width)
 {
-  int column;
-  uint32 atex, atbuf, *src, *dst;
+  int32_t column;
+  uint32_t atex, atbuf, *src, *dst;
 
   /* Common data */
-  uint32 xscroll = *(uint32 *)&vram[hscb + ((line & hscroll_mask) << 2)];
-  uint32 yscroll = *(uint32 *)&vsram[0];
+  uint32_t xscroll = *(uint32_t *)&vram[hscb + ((line & hscroll_mask) << 2)];
+  uint32_t yscroll = *(uint32_t *)&vsram[0];
 
   /* Plane B width */
-  int start = 0;
-  int end = width >> 4;
+  int32_t start = 0;
+  int32_t end = width >> 4;
 
   /* Plane B scroll */
 #ifdef LSB_FIRST
-  uint32 shift  = (xscroll >> 16) & 0x0F;
-  uint32 index  = playfield_col_mask + 1 - ((xscroll >> 20) & playfield_col_mask);
-  uint32 v_line = (line + ((yscroll >> 16) & 0x3FF)) & playfield_row_mask;
+  uint32_t shift  = (xscroll >> 16) & 0x0F;
+  uint32_t index  = playfield_col_mask + 1 - ((xscroll >> 20) & playfield_col_mask);
+  uint32_t v_line = (line + ((yscroll >> 16) & 0x3FF)) & playfield_row_mask;
 #else
-  uint32 shift  = (xscroll & 0x0F);
-  uint32 index  = playfield_col_mask + 1 - ((xscroll >> 4) & playfield_col_mask);
-  uint32 v_line = (line + (yscroll & 0x3FF)) & playfield_row_mask;
+  uint32_t shift  = (xscroll & 0x0F);
+  uint32_t index  = playfield_col_mask + 1 - ((xscroll >> 4) & playfield_col_mask);
+  uint32_t v_line = (line + (yscroll & 0x3FF)) & playfield_row_mask;
 #endif
 
   /* Plane B name table */
-  uint32 *nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << playfield_shift) & 0x1FC0)];
+  uint32_t *nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << playfield_shift) & 0x1FC0)];
 
   /* Pattern row index */
   v_line = (v_line & 7) << 3;
@@ -1348,7 +1348,7 @@ void render_bg_m5(int line, int width)
   if(shift)
   {
     /* Plane B line buffer */
-    dst = (uint32 *)&linebuf[0][0x10 + shift];
+    dst = (uint32_t *)&linebuf[0][0x10 + shift];
 
     atbuf = nt[(index - 1) & playfield_col_mask];
     DRAW_COLUMN(atbuf, v_line)
@@ -1356,7 +1356,7 @@ void render_bg_m5(int line, int width)
   else
   {
     /* Plane B line buffer */
-    dst = (uint32 *)&linebuf[0][0x20];
+    dst = (uint32_t *)&linebuf[0][0x20];
   }
 
   for(column = 0; column < end; column++, index++)
@@ -1366,8 +1366,8 @@ void render_bg_m5(int line, int width)
   }
 
   /* Window & Plane A */
-  int a = (reg[18] & 0x1F) << 3;
-  int w = (reg[18] >> 7) & 1;
+  int32_t a = (reg[18] & 0x1F) << 3;
+  int32_t w = (reg[18] >> 7) & 1;
 
   if (w == (line >= a))
   {
@@ -1401,7 +1401,7 @@ void render_bg_m5(int line, int width)
 #endif
 
     /* Plane A name table */
-    nt = (uint32 *)&vram[ntab + (((v_line >> 3) << playfield_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << playfield_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (v_line & 7) << 3;
@@ -1409,7 +1409,7 @@ void render_bg_m5(int line, int width)
     if(shift)
     {
       /* Plane A line buffer */
-      dst = (uint32 *)&linebuf[1][0x10 + shift + (start << 4)];
+      dst = (uint32_t *)&linebuf[1][0x10 + shift + (start << 4)];
 
       /* Window bug */
       if (start)
@@ -1426,7 +1426,7 @@ void render_bg_m5(int line, int width)
     else
     {
       /* Plane A line buffer */
-      dst = (uint32 *)&linebuf[1][0x20 + (start << 4)];
+      dst = (uint32_t *)&linebuf[1][0x20 + (start << 4)];
     }
 
     for(column = start; column < end; column++, index++)
@@ -1444,13 +1444,13 @@ void render_bg_m5(int line, int width)
   if (w)
   {
     /* Window name table */
-    nt = (uint32 *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
+    nt = (uint32_t *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
 
     /* Pattern row index */
     v_line = (line & 7) << 3;
 
     /* Plane A line buffer */
-    dst = (uint32 *)&linebuf[1][0x20 + (start << 4)];
+    dst = (uint32_t *)&linebuf[1][0x20 + (start << 4)];
 
     for(column = start; column < end; column++)
     {
@@ -1460,31 +1460,31 @@ void render_bg_m5(int line, int width)
   }
 }
 
-void render_bg_m5_vs(int line, int width)
+void render_bg_m5_vs(int32_t line, int32_t width)
 {
-  int column;
-  uint32 atex, atbuf, *src, *dst;
-  uint32 v_line, *nt;
+  int32_t column;
+  uint32_t atex, atbuf, *src, *dst;
+  uint32_t v_line, *nt;
 
   /* Common data */
-  uint32 xscroll      = *(uint32 *)&vram[hscb + ((line & hscroll_mask) << 2)];
-  uint32 yscroll      = 0;
-  uint32 pf_col_mask  = playfield_col_mask;
-  uint32 pf_row_mask  = playfield_row_mask;
-  uint32 pf_shift     = playfield_shift;
-  uint32 *vs          = (uint32 *)&vsram[0];
+  uint32_t xscroll      = *(uint32_t *)&vram[hscb + ((line & hscroll_mask) << 2)];
+  uint32_t yscroll      = 0;
+  uint32_t pf_col_mask  = playfield_col_mask;
+  uint32_t pf_row_mask  = playfield_row_mask;
+  uint32_t pf_shift     = playfield_shift;
+  uint32_t *vs          = (uint32_t *)&vsram[0];
 
   /* Plane B width */
-  int start = 0;
-  int end = width >> 4;
+  int32_t start = 0;
+  int32_t end = width >> 4;
 
   /* Plane B horizontal scroll */
 #ifdef LSB_FIRST
-  uint32 shift  = (xscroll >> 16) & 0x0F;
-  uint32 index  = pf_col_mask + 1 - ((xscroll >> 20) & pf_col_mask);
+  uint32_t shift  = (xscroll >> 16) & 0x0F;
+  uint32_t index  = pf_col_mask + 1 - ((xscroll >> 20) & pf_col_mask);
 #else
-  uint32 shift  = (xscroll & 0x0F);
-  uint32 index  = pf_col_mask + 1 - ((xscroll >> 4) & pf_col_mask);
+  uint32_t shift  = (xscroll & 0x0F);
+  uint32_t index  = pf_col_mask + 1 - ((xscroll >> 4) & pf_col_mask);
 #endif
 
   /* Left-most column vertical scrolling when partially shown horizontally */
@@ -1502,13 +1502,13 @@ void render_bg_m5_vs(int line, int width)
     v_line = (line + yscroll) & pf_row_mask;
 
     /* Plane B name table */
-    nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (v_line & 7) << 3;
 
     /* Plane B line buffer */
-    dst = (uint32 *)&linebuf[0][0x10 + shift];
+    dst = (uint32_t *)&linebuf[0][0x10 + shift];
 
     atbuf = nt[(index - 1) & pf_col_mask];
     DRAW_COLUMN(atbuf, v_line)
@@ -1516,7 +1516,7 @@ void render_bg_m5_vs(int line, int width)
   else
   {
     /* Plane B line buffer */
-    dst = (uint32 *)&linebuf[0][0x20];
+    dst = (uint32_t *)&linebuf[0][0x20];
   }
 
   for(column = 0; column < end; column++, index++)
@@ -1529,7 +1529,7 @@ void render_bg_m5_vs(int line, int width)
 #endif
 
     /* Plane B name table */
-    nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (v_line & 7) << 3;
@@ -1539,8 +1539,8 @@ void render_bg_m5_vs(int line, int width)
   }
   
   /* Window & Plane A */
-  int a = (reg[18] & 0x1F) << 3;
-  int w = (reg[18] >> 7) & 1;
+  int32_t a = (reg[18] & 0x1F) << 3;
+  int32_t w = (reg[18] >> 7) & 1;
 
   if (w == (line >= a))
   {
@@ -1577,13 +1577,13 @@ void render_bg_m5_vs(int line, int width)
       v_line = (line + yscroll) & pf_row_mask;
 
       /* Plane A name table */
-      nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+      nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
       /* Pattern row index */
       v_line = (v_line & 7) << 3;
 
       /* Plane A line buffer */
-      dst = (uint32 *)&linebuf[1][0x10 + shift + (start << 4)];
+      dst = (uint32_t *)&linebuf[1][0x10 + shift + (start << 4)];
 
       /* Window bug */
       if (start)
@@ -1600,7 +1600,7 @@ void render_bg_m5_vs(int line, int width)
     else
     {
       /* Plane A line buffer */
-      dst = (uint32 *)&linebuf[1][0x20 + (start << 4)];
+      dst = (uint32_t *)&linebuf[1][0x20 + (start << 4)];
     }
 
     for(column = start; column < end; column++, index++)
@@ -1613,7 +1613,7 @@ void render_bg_m5_vs(int line, int width)
 #endif
 
       /* Plane A name table */
-      nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+      nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
       /* Pattern row index */
       v_line = (v_line & 7) << 3;
@@ -1631,13 +1631,13 @@ void render_bg_m5_vs(int line, int width)
   if (w)
   {
     /* Window name table */
-    nt = (uint32 *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
+    nt = (uint32_t *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
 
     /* Pattern row index */
     v_line = (line & 7) << 3;
 
     /* Plane A line buffer */
-    dst = (uint32 *)&linebuf[1][0x20 + (start << 4)];
+    dst = (uint32_t *)&linebuf[1][0x20 + (start << 4)];
 
     for(column = start; column < end; column++)
     {
@@ -1647,37 +1647,37 @@ void render_bg_m5_vs(int line, int width)
   }
 }
 
-void render_bg_m5_im2(int line, int width)
+void render_bg_m5_im2(int32_t line, int32_t width)
 {
-  int column;
-  uint32 atex, atbuf, *src, *dst;
+  int32_t column;
+  uint32_t atex, atbuf, *src, *dst;
 
   /* Common data */
-  uint32 xscroll      = *(uint32 *)&vram[hscb + ((line & hscroll_mask) << 2)];
-  uint32 yscroll      = *(uint32 *)&vsram[0];
-  uint32 pf_col_mask  = playfield_col_mask;
-  uint32 pf_row_mask  = playfield_row_mask;
-  uint32 pf_shift     = playfield_shift;
+  uint32_t xscroll      = *(uint32_t *)&vram[hscb + ((line & hscroll_mask) << 2)];
+  uint32_t yscroll      = *(uint32_t *)&vsram[0];
+  uint32_t pf_col_mask  = playfield_col_mask;
+  uint32_t pf_row_mask  = playfield_row_mask;
+  uint32_t pf_shift     = playfield_shift;
 
-  int odd = odd_frame;
+  int32_t odd = odd_frame;
 
   /* Plane B width */
-  int start = 0;
-  int end = width >> 4;
+  int32_t start = 0;
+  int32_t end = width >> 4;
 
   /* Plane B scroll */
 #ifdef LSB_FIRST
-  uint32 shift  = (xscroll >> 16) & 0x0F;
-  uint32 index  = pf_col_mask + 1 - ((xscroll >> 20) & pf_col_mask);
-  uint32 v_line = (line + ((yscroll >> 17) & 0x3FF)) & pf_row_mask;
+  uint32_t shift  = (xscroll >> 16) & 0x0F;
+  uint32_t index  = pf_col_mask + 1 - ((xscroll >> 20) & pf_col_mask);
+  uint32_t v_line = (line + ((yscroll >> 17) & 0x3FF)) & pf_row_mask;
 #else
-  uint32 shift  = (xscroll & 0x0F);
-  uint32 index  = pf_col_mask + 1 - ((xscroll >> 4) & pf_col_mask);
-  uint32 v_line = (line + ((yscroll >> 1) & 0x3FF)) & pf_row_mask;
+  uint32_t shift  = (xscroll & 0x0F);
+  uint32_t index  = pf_col_mask + 1 - ((xscroll >> 4) & pf_col_mask);
+  uint32_t v_line = (line + ((yscroll >> 1) & 0x3FF)) & pf_row_mask;
 #endif
 
   /* Plane B name table */
-  uint32 *nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+  uint32_t *nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
   /* Pattern row index */
   v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -1685,7 +1685,7 @@ void render_bg_m5_im2(int line, int width)
   if(shift)
   {
     /* Plane B line buffer */
-    dst = (uint32 *)&linebuf[0][0x10 + shift];
+    dst = (uint32_t *)&linebuf[0][0x10 + shift];
 
     atbuf = nt[(index - 1) & pf_col_mask];
     DRAW_COLUMN_IM2(atbuf, v_line)
@@ -1693,7 +1693,7 @@ void render_bg_m5_im2(int line, int width)
   else
   {
     /* Plane B line buffer */
-    dst = (uint32 *)&linebuf[0][0x20];
+    dst = (uint32_t *)&linebuf[0][0x20];
   }
 
   for(column = 0; column < end; column++, index++)
@@ -1703,8 +1703,8 @@ void render_bg_m5_im2(int line, int width)
   }
 
   /* Window & Plane A */
-  int a = (reg[18] & 0x1F) << 3;
-  int w = (reg[18] >> 7) & 1;
+  int32_t a = (reg[18] & 0x1F) << 3;
+  int32_t w = (reg[18] >> 7) & 1;
 
   if (w == (line >= a))
   {
@@ -1738,7 +1738,7 @@ void render_bg_m5_im2(int line, int width)
 #endif
 
     /* Plane A name table */
-    nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -1746,7 +1746,7 @@ void render_bg_m5_im2(int line, int width)
     if(shift)
     {
       /* Plane A line buffer */
-      dst = (uint32 *)&linebuf[1][0x10 + shift + (start << 4)];
+      dst = (uint32_t *)&linebuf[1][0x10 + shift + (start << 4)];
 
       /* Window bug */
       if (start)
@@ -1763,7 +1763,7 @@ void render_bg_m5_im2(int line, int width)
     else
     {
       /* Plane A line buffer */
-      dst = (uint32 *)&linebuf[1][0x20 + (start << 4)];
+      dst = (uint32_t *)&linebuf[1][0x20 + (start << 4)];
     }
 
     for(column = start; column < end; column++, index++)
@@ -1781,13 +1781,13 @@ void render_bg_m5_im2(int line, int width)
   if (w)
   {
     /* Window name table */
-    nt = (uint32 *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
+    nt = (uint32_t *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
 
     /* Pattern row index */
     v_line = ((line & 7) << 1 | odd) << 3;
 
     /* Plane A line buffer */
-    dst = (uint32 *)&linebuf[1][0x20 + (start << 4)];
+    dst = (uint32_t *)&linebuf[1][0x20 + (start << 4)];
 
     for(column = start; column < end; column++)
     {
@@ -1797,33 +1797,33 @@ void render_bg_m5_im2(int line, int width)
   }
 }
 
-void render_bg_m5_im2_vs(int line, int width)
+void render_bg_m5_im2_vs(int32_t line, int32_t width)
 {
-  int column;
-  uint32 atex, atbuf, *src, *dst;
-  uint32 v_line, *nt;
+  int32_t column;
+  uint32_t atex, atbuf, *src, *dst;
+  uint32_t v_line, *nt;
 
   /* Common data */
-  uint32 xscroll      = *(uint32 *)&vram[hscb + ((line & hscroll_mask) << 2)];
-  uint32 yscroll      = 0;
-  uint32 pf_col_mask  = playfield_col_mask;
-  uint32 pf_row_mask  = playfield_row_mask;
-  uint32 pf_shift     = playfield_shift;
-  uint32 *vs          = (uint32 *)&vsram[0];
+  uint32_t xscroll      = *(uint32_t *)&vram[hscb + ((line & hscroll_mask) << 2)];
+  uint32_t yscroll      = 0;
+  uint32_t pf_col_mask  = playfield_col_mask;
+  uint32_t pf_row_mask  = playfield_row_mask;
+  uint32_t pf_shift     = playfield_shift;
+  uint32_t *vs          = (uint32_t *)&vsram[0];
 
-  int odd = odd_frame;
+  int32_t odd = odd_frame;
 
   /* Plane B width */
-  int start = 0;
-  int end = width >> 4;
+  int32_t start = 0;
+  int32_t end = width >> 4;
 
   /* Plane B horizontal scroll */
 #ifdef LSB_FIRST
-  uint32 shift  = (xscroll >> 16) & 0x0F;
-  uint32 index  = pf_col_mask + 1 - ((xscroll >> 20) & pf_col_mask);
+  uint32_t shift  = (xscroll >> 16) & 0x0F;
+  uint32_t index  = pf_col_mask + 1 - ((xscroll >> 20) & pf_col_mask);
 #else
-  uint32 shift  = (xscroll & 0x0F);
-  uint32 index  = pf_col_mask + 1 - ((xscroll >> 4) & pf_col_mask);
+  uint32_t shift  = (xscroll & 0x0F);
+  uint32_t index  = pf_col_mask + 1 - ((xscroll >> 4) & pf_col_mask);
 #endif
 
   /* Left-most column vertical scrolling when partially shown horizontally */
@@ -1842,13 +1842,13 @@ void render_bg_m5_im2_vs(int line, int width)
     v_line = (line + yscroll) & pf_row_mask;
 
     /* Plane B name table */
-    nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (((v_line & 7) << 1) | odd) << 3;
 
     /* Plane B line buffer */
-    dst = (uint32 *)&linebuf[0][0x10 + shift];
+    dst = (uint32_t *)&linebuf[0][0x10 + shift];
 
     atbuf = nt[(index - 1) & pf_col_mask];
     DRAW_COLUMN_IM2(atbuf, v_line)
@@ -1856,7 +1856,7 @@ void render_bg_m5_im2_vs(int line, int width)
   else
   {
     /* Plane B line buffer */
-    dst = (uint32 *)&linebuf[0][0x20];
+    dst = (uint32_t *)&linebuf[0][0x20];
   }
 
   for(column = 0; column < end; column++, index++)
@@ -1869,7 +1869,7 @@ void render_bg_m5_im2_vs(int line, int width)
 #endif
 
     /* Plane B name table */
-    nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -1879,8 +1879,8 @@ void render_bg_m5_im2_vs(int line, int width)
   }
 
   /* Window & Plane A */
-  int a = (reg[18] & 0x1F) << 3;
-  int w = (reg[18] >> 7) & 1;
+  int32_t a = (reg[18] & 0x1F) << 3;
+  int32_t w = (reg[18] >> 7) & 1;
 
   if (w == (line >= a))
   {
@@ -1917,13 +1917,13 @@ void render_bg_m5_im2_vs(int line, int width)
       v_line = (line + yscroll) & pf_row_mask;
 
       /* Plane A name table */
-      nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+      nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
       /* Pattern row index */
       v_line = (((v_line & 7) << 1) | odd) << 3;
 
       /* Plane A line buffer */
-      dst = (uint32 *)&linebuf[1][0x10 + shift + (start << 4)];
+      dst = (uint32_t *)&linebuf[1][0x10 + shift + (start << 4)];
 
       /* Window bug */
       if (start)
@@ -1940,7 +1940,7 @@ void render_bg_m5_im2_vs(int line, int width)
     else
     {
       /* Plane A line buffer */
-      dst = (uint32 *)&linebuf[1][0x20 + (start << 4)];
+      dst = (uint32_t *)&linebuf[1][0x20 + (start << 4)];
     }
 
     for(column = start; column < end; column++, index++)
@@ -1953,7 +1953,7 @@ void render_bg_m5_im2_vs(int line, int width)
 #endif
 
       /* Plane A name table */
-      nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+      nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
       /* Pattern row index */
       v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -1971,13 +1971,13 @@ void render_bg_m5_im2_vs(int line, int width)
   if (w)
   {
     /* Window name table */
-    nt = (uint32 *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
+    nt = (uint32_t *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
 
     /* Pattern row index */
     v_line = ((line & 7) << 1 | odd) << 3;
 
     /* Plane A line buffer */
-    dst = (uint32 *)&linebuf[1][0x20 + (start << 4)];
+    dst = (uint32_t *)&linebuf[1][0x20 + (start << 4)];
 
     for(column = start; column < end; column++)
     {
@@ -1989,27 +1989,27 @@ void render_bg_m5_im2_vs(int line, int width)
 
 #else
 
-void render_bg_m5(int line, int width)
+void render_bg_m5(int32_t line, int32_t width)
 {
-  int column, start, end;
-  uint32 atex, atbuf, *src, *dst;
-  uint32 shift, index, v_line, *nt;
+  int32_t column, start, end;
+  uint32_t atex, atbuf, *src, *dst;
+  uint32_t shift, index, v_line, *nt;
 
   /* Scroll Planes common data */
-  uint32 xscroll      = *(uint32 *)&vram[hscb + ((line & hscroll_mask) << 2)];
-  uint32 yscroll      = *(uint32 *)&vsram[0];
-  uint32 pf_col_mask  = playfield_col_mask;
-  uint32 pf_row_mask  = playfield_row_mask;
-  uint32 pf_shift     = playfield_shift;
+  uint32_t xscroll      = *(uint32_t *)&vram[hscb + ((line & hscroll_mask) << 2)];
+  uint32_t yscroll      = *(uint32_t *)&vsram[0];
+  uint32_t pf_col_mask  = playfield_col_mask;
+  uint32_t pf_row_mask  = playfield_row_mask;
+  uint32_t pf_shift     = playfield_shift;
 
   /* Layer priority table */
-  uint8 *table = lut[(reg[12] & 8) >> 2];
+  uint8_t *table = lut[(reg[12] & 8) >> 2];
 
   /* Window vertical range (cell 0-31) */
-  int a = (reg[18] & 0x1F) << 3;
+  int32_t a = (reg[18] & 0x1F) << 3;
 
   /* Window position (0=top, 1=bottom) */
-  int w = (reg[18] >> 7) & 1;
+  int32_t w = (reg[18] >> 7) & 1;
 
   /* Test against current line */
   if (w == (line >= a))
@@ -2047,10 +2047,10 @@ void render_bg_m5(int line, int width)
 #endif
 
     /* Background line buffer */
-    dst = (uint32 *)&linebuf[0][0x20 + (start << 4) + shift];
+    dst = (uint32_t *)&linebuf[0][0x20 + (start << 4) + shift];
 
     /* Plane A name table */
-    nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (v_line & 7) << 3;
@@ -2094,10 +2094,10 @@ void render_bg_m5(int line, int width)
   if (w)
   {
     /* Background line buffer */
-    dst = (uint32 *)&linebuf[0][0x20 + (start << 4)];
+    dst = (uint32_t *)&linebuf[0][0x20 + (start << 4)];
 
     /* Window name table */
-    nt = (uint32 *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
+    nt = (uint32_t *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
 
     /* Pattern row index */
     v_line = (line & 7) << 3;
@@ -2121,13 +2121,13 @@ void render_bg_m5(int line, int width)
 #endif
 
   /* Plane B name table */
-  nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+  nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
   
   /* Pattern row index */
   v_line = (v_line & 7) << 3;
 
   /* Background line buffer */
-  uint8 *lb = &linebuf[0][0x20];
+  uint8_t *lb = &linebuf[0][0x20];
 
   if(shift)
   {
@@ -2145,28 +2145,28 @@ void render_bg_m5(int line, int width)
   }
 }
 
-void render_bg_m5_vs(int line, int width)
+void render_bg_m5_vs(int32_t line, int32_t width)
 {
-  int column, start, end;
-  uint32 atex, atbuf, *src, *dst;
-  uint32 shift, index, v_line, *nt;
+  int32_t column, start, end;
+  uint32_t atex, atbuf, *src, *dst;
+  uint32_t shift, index, v_line, *nt;
 
   /* Scroll Planes common data */
-  uint32 xscroll      = *(uint32 *)&vram[hscb + ((line & hscroll_mask) << 2)];
-  uint32 yscroll      = 0;
-  uint32 pf_col_mask  = playfield_col_mask;
-  uint32 pf_row_mask  = playfield_row_mask;
-  uint32 pf_shift     = playfield_shift;
-  uint32 *vs          = (uint32 *)&vsram[0];
+  uint32_t xscroll      = *(uint32_t *)&vram[hscb + ((line & hscroll_mask) << 2)];
+  uint32_t yscroll      = 0;
+  uint32_t pf_col_mask  = playfield_col_mask;
+  uint32_t pf_row_mask  = playfield_row_mask;
+  uint32_t pf_shift     = playfield_shift;
+  uint32_t *vs          = (uint32_t *)&vsram[0];
 
   /* Layer priority table */
-  uint8 *table = lut[(reg[12] & 8) >> 2];
+  uint8_t *table = lut[(reg[12] & 8) >> 2];
 
   /* Window vertical range (cell 0-31) */
-  int a = (reg[18] & 0x1F) << 3;
+  int32_t a = (reg[18] & 0x1F) << 3;
 
   /* Window position (0=top, 1=bottom) */
-  int w = (reg[18] >> 7) & 1;
+  int32_t w = (reg[18] >> 7) & 1;
 
   /* Test against current line */
   if (w == (line >= a))
@@ -2211,7 +2211,7 @@ void render_bg_m5_vs(int line, int width)
 #endif
 
     /* Background line buffer */
-    dst = (uint32 *)&linebuf[0][0x20 + (start << 4) + shift];
+    dst = (uint32_t *)&linebuf[0][0x20 + (start << 4) + shift];
 
     if(shift)
     {
@@ -2222,7 +2222,7 @@ void render_bg_m5_vs(int line, int width)
       v_line = (line + yscroll) & pf_row_mask;
 
       /* Plane A name table */
-      nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+      nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
       /* Pattern row index */
       v_line = (v_line & 7) << 3;
@@ -2250,7 +2250,7 @@ void render_bg_m5_vs(int line, int width)
 #endif
 
       /* Plane A name table */
-      nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+      nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
       /* Pattern row index */
       v_line = (v_line & 7) << 3;
@@ -2274,10 +2274,10 @@ void render_bg_m5_vs(int line, int width)
   if (w)
   {
     /* Background line buffer */
-    dst = (uint32 *)&linebuf[0][0x20 + (start << 4)];
+    dst = (uint32_t *)&linebuf[0][0x20 + (start << 4)];
 
     /* Window name table */
-    nt = (uint32 *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
+    nt = (uint32_t *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
 
     /* Pattern row index */
     v_line = (line & 7) << 3;
@@ -2299,7 +2299,7 @@ void render_bg_m5_vs(int line, int width)
 #endif
 
   /* Background line buffer */
-  uint8 *lb = &linebuf[0][0x20];
+  uint8_t *lb = &linebuf[0][0x20];
 
   if(shift)
   {
@@ -2310,7 +2310,7 @@ void render_bg_m5_vs(int line, int width)
     v_line = (line + yscroll) & pf_row_mask;
 
     /* Plane B name table */
-    nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (v_line & 7) << 3;
@@ -2329,7 +2329,7 @@ void render_bg_m5_vs(int line, int width)
 #endif
 
     /* Plane B name table */
-    nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (v_line & 7) << 3;
@@ -2339,28 +2339,28 @@ void render_bg_m5_vs(int line, int width)
   }
 }
 
-void render_bg_m5_im2(int line, int width)
+void render_bg_m5_im2(int32_t line, int32_t width)
 {
-  int column, start, end;
-  uint32 atex, atbuf, *src, *dst;
-  uint32 shift, index, v_line, *nt;
+  int32_t column, start, end;
+  uint32_t atex, atbuf, *src, *dst;
+  uint32_t shift, index, v_line, *nt;
 
   /* Scroll Planes common data */
-  int odd = odd_frame;
-  uint32 xscroll      = *(uint32 *)&vram[hscb + ((line & hscroll_mask) << 2)];
-  uint32 yscroll      = *(uint32 *)&vsram[0];
-  uint32 pf_col_mask  = playfield_col_mask;
-  uint32 pf_row_mask  = playfield_row_mask;
-  uint32 pf_shift     = playfield_shift;
+  int32_t odd = odd_frame;
+  uint32_t xscroll      = *(uint32_t *)&vram[hscb + ((line & hscroll_mask) << 2)];
+  uint32_t yscroll      = *(uint32_t *)&vsram[0];
+  uint32_t pf_col_mask  = playfield_col_mask;
+  uint32_t pf_row_mask  = playfield_row_mask;
+  uint32_t pf_shift     = playfield_shift;
 
   /* Layer priority table */
-  uint8 *table = lut[(reg[12] & 8) >> 2];
+  uint8_t *table = lut[(reg[12] & 8) >> 2];
 
   /* Window vertical range (cell 0-31) */
-  int a = (reg[18] & 0x1F) << 3;
+  int32_t a = (reg[18] & 0x1F) << 3;
   
   /* Window position (0=top, 1=bottom) */
-  int w = (reg[18] >> 7) & 1;
+  int32_t w = (reg[18] >> 7) & 1;
 
   /* Test against current line */
   if (w == (line >= a))
@@ -2398,10 +2398,10 @@ void render_bg_m5_im2(int line, int width)
 #endif
 
     /* Background line buffer */
-    dst = (uint32 *)&linebuf[0][0x20 + (start << 4) + shift];
+    dst = (uint32_t *)&linebuf[0][0x20 + (start << 4) + shift];
 
     /* Plane A name table */
-    nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -2445,10 +2445,10 @@ void render_bg_m5_im2(int line, int width)
   if (w)
   {
     /* Background line buffer */
-    dst = (uint32 *)&linebuf[0][0x20 + (start << 4)];
+    dst = (uint32_t *)&linebuf[0][0x20 + (start << 4)];
 
     /* Window name table */
-    nt = (uint32 *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
+    nt = (uint32_t *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
 
     /* Pattern row index */
     v_line = ((line & 7) << 1 | odd) << 3;
@@ -2472,13 +2472,13 @@ void render_bg_m5_im2(int line, int width)
 #endif
 
   /* Plane B name table */
-  nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+  nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
   /* Pattern row index */
   v_line = (((v_line & 7) << 1) | odd) << 3;
 
   /* Background line buffer */
-  uint8 *lb = &linebuf[0][0x20];
+  uint8_t *lb = &linebuf[0][0x20];
 
   if(shift)
   {
@@ -2496,29 +2496,29 @@ void render_bg_m5_im2(int line, int width)
   }
 }
 
-void render_bg_m5_im2_vs(int line, int width)
+void render_bg_m5_im2_vs(int32_t line, int32_t width)
 {
-  int column, start, end;
-  uint32 atex, atbuf, *src, *dst;
-  uint32 shift, index, v_line, *nt;
+  int32_t column, start, end;
+  uint32_t atex, atbuf, *src, *dst;
+  uint32_t shift, index, v_line, *nt;
 
   /* common data */
-  int odd = odd_frame;
-  uint32 xscroll      = *(uint32 *)&vram[hscb + ((line & hscroll_mask) << 2)];
-  uint32 yscroll      = 0;
-  uint32 pf_col_mask  = playfield_col_mask;
-  uint32 pf_row_mask  = playfield_row_mask;
-  uint32 pf_shift     = playfield_shift;
-  uint32 *vs          = (uint32 *)&vsram[0];
+  int32_t odd = odd_frame;
+  uint32_t xscroll      = *(uint32_t *)&vram[hscb + ((line & hscroll_mask) << 2)];
+  uint32_t yscroll      = 0;
+  uint32_t pf_col_mask  = playfield_col_mask;
+  uint32_t pf_row_mask  = playfield_row_mask;
+  uint32_t pf_shift     = playfield_shift;
+  uint32_t *vs          = (uint32_t *)&vsram[0];
 
   /* Layer priority table */
-  uint8 *table = lut[(reg[12] & 8) >> 2];
+  uint8_t *table = lut[(reg[12] & 8) >> 2];
 
   /* Window vertical range (cell 0-31) */
-  uint32 a = (reg[18] & 0x1F) << 3;
+  uint32_t a = (reg[18] & 0x1F) << 3;
   
   /* Window position (0=top, 1=bottom) */
-  uint32 w = (reg[18] >> 7) & 1;
+  uint32_t w = (reg[18] >> 7) & 1;
 
   /* Test against current line */
   if (w == (line >= a))
@@ -2564,7 +2564,7 @@ void render_bg_m5_im2_vs(int line, int width)
 #endif
 
     /* Background line buffer */
-    dst = (uint32 *)&linebuf[0][0x20 + (start << 4) + shift];
+    dst = (uint32_t *)&linebuf[0][0x20 + (start << 4) + shift];
 
     if(shift)
     {
@@ -2575,7 +2575,7 @@ void render_bg_m5_im2_vs(int line, int width)
       v_line = (line + yscroll) & pf_row_mask;
 
       /* Plane A name table */
-      nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+      nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
       /* Pattern row index */
       v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -2603,7 +2603,7 @@ void render_bg_m5_im2_vs(int line, int width)
 #endif
 
       /* Plane A name table */
-      nt = (uint32 *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+      nt = (uint32_t *)&vram[ntab + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
       /* Pattern row index */
       v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -2627,10 +2627,10 @@ void render_bg_m5_im2_vs(int line, int width)
   if (w)
   {
     /* Background line buffer */
-    dst = (uint32 *)&linebuf[0][0x20 + (start << 4)];
+    dst = (uint32_t *)&linebuf[0][0x20 + (start << 4)];
 
     /* Window name table */
-    nt = (uint32 *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
+    nt = (uint32_t *)&vram[ntwb | ((line >> 3) << (6 + (reg[12] & 1)))];
 
     /* Pattern row index */
     v_line = ((line & 7) << 1 | odd) << 3;
@@ -2652,7 +2652,7 @@ void render_bg_m5_im2_vs(int line, int width)
 #endif
 
   /* Background line buffer */
-  uint8 *lb = &linebuf[0][0x20];
+  uint8_t *lb = &linebuf[0][0x20];
 
   if(shift)
   {
@@ -2663,7 +2663,7 @@ void render_bg_m5_im2_vs(int line, int width)
     v_line = (line + yscroll) & pf_row_mask;
 
     /* Plane B name table */
-    nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -2682,7 +2682,7 @@ void render_bg_m5_im2_vs(int line, int width)
 #endif
 
     /* Plane B name table */
-    nt = (uint32 *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
+    nt = (uint32_t *)&vram[ntbb + (((v_line >> 3) << pf_shift) & 0x1FC0)];
 
     /* Pattern row index */
     v_line = (((v_line & 7) << 1) | odd) << 3;
@@ -2698,11 +2698,11 @@ void render_bg_m5_im2_vs(int line, int width)
 /* Sprite layer rendering functions                                         */
 /*--------------------------------------------------------------------------*/
 
-void render_obj_m4(int max_width)
+void render_obj_m4(int32_t max_width)
 {
-  int i, count, xpos, width;
-  uint8 *src, *lb;
-  uint16 temp;
+  int32_t i, count, xpos, width;
+  uint8_t *src, *lb;
+  uint16_t temp;
 
   /* Set SOVR flag */
   status |= spr_over;
@@ -2747,23 +2747,23 @@ void render_obj_m4(int max_width)
     temp &= ~((reg[1] & 0x02) >> 1);
 
     /* Pointer to pattern cache line */
-    src = (uint8 *)&bg_pattern_cache[(temp << 6) | (object_info[count].ypos << 3)];
+    src = (uint8_t *)&bg_pattern_cache[(temp << 6) | (object_info[count].ypos << 3)];
 
     /* Draw sprite pattern */
     DRAW_SPRITE_TILE(width,0,lut[5])
   }
 }
 
-void render_obj_m5(int max_width)
+void render_obj_m5(int32_t max_width)
 {
-  int i, count, column;
-  int xpos, width;
-  int pixelcount = 0;
-  int masked = 0;
+  int32_t i, count, column;
+  int32_t xpos, width;
+  int32_t pixelcount = 0;
+  int32_t masked = 0;
 
-  uint8 *src, *s, *lb;
-  uint32 temp, v_line;
-  uint32 attr, name, atex;
+  uint8_t *src, *s, *lb;
+  uint32_t temp, v_line;
+  uint32_t attr, name, atex;
 
 #ifndef ALT_RENDERER
   /* Merge background layers */
@@ -2860,16 +2860,16 @@ void render_obj_m5(int max_width)
   spr_over = 0;
 }
 
-void render_obj_m5_ste(int max_width)
+void render_obj_m5_ste(int32_t max_width)
 {
-  int i, count, column;
-  int xpos, width;
-  int pixelcount = 0;
-  int masked = 0;
+  int32_t i, count, column;
+  int32_t xpos, width;
+  int32_t pixelcount = 0;
+  int32_t masked = 0;
 
-  uint8 *src, *s, *lb;
-  uint32 temp, v_line;
-  uint32 attr, name, atex;
+  uint8_t *src, *s, *lb;
+  uint32_t temp, v_line;
+  uint32_t attr, name, atex;
 
 #ifndef ALT_RENDERER
   /* Merge background layers */
@@ -2975,17 +2975,17 @@ void render_obj_m5_ste(int max_width)
   merge(&linebuf[1][0x20],&linebuf[0][0x20],&linebuf[0][0x20],lut[4], max_width);
 }
 
-void render_obj_m5_im2(int max_width)
+void render_obj_m5_im2(int32_t max_width)
 {
-  int i, count, column;
-  int xpos, width;
-  int pixelcount = 0;
-  int masked = 0;
-  int odd = odd_frame;
+  int32_t i, count, column;
+  int32_t xpos, width;
+  int32_t pixelcount = 0;
+  int32_t masked = 0;
+  int32_t odd = odd_frame;
 
-  uint8 *src, *s, *lb;
-  uint32 temp, v_line;
-  uint32 attr, name, atex;
+  uint8_t *src, *s, *lb;
+  uint32_t temp, v_line;
+  uint32_t attr, name, atex;
 
 #ifndef ALT_RENDERER
   /* Merge background layers */
@@ -3082,17 +3082,17 @@ void render_obj_m5_im2(int max_width)
   spr_over = 0;
 }
 
-void render_obj_m5_im2_ste(int max_width)
+void render_obj_m5_im2_ste(int32_t max_width)
 {
-  int i, count, column;
-  int xpos, width;
-  int pixelcount = 0;
-  int masked = 0;
-  int odd = odd_frame;
+  int32_t i, count, column;
+  int32_t xpos, width;
+  int32_t pixelcount = 0;
+  int32_t masked = 0;
+  int32_t odd = odd_frame;
 
-  uint8 *src, *s, *lb;
-  uint32 temp, v_line;
-  uint32 attr, name, atex;
+  uint8_t *src, *s, *lb;
+  uint32_t temp, v_line;
+  uint32_t attr, name, atex;
 
 #ifndef ALT_RENDERER
   /* Merge background layers */
@@ -3203,21 +3203,21 @@ void render_obj_m5_im2_ste(int max_width)
 /* Sprites Parsing functions                                                */
 /*--------------------------------------------------------------------------*/
 
-void parse_satb_m4(int line)
+void parse_satb_m4(int32_t line)
 {
-  int i;
+  int32_t i;
 
   /* Pointer to sprite attribute table */
-  uint8 *st = &vram[(reg[5] << 7) & 0x3F00];
+  uint8_t *st = &vram[(reg[5] << 7) & 0x3F00];
 
   /* Sprite counter (64 max.) */
-  int count = 0;
+  int32_t count = 0;
 
   /* Y position */
-  int ypos;
+  int32_t ypos;
 
   /* Sprite height (8x8 by default) */
-  int height = 8;
+  int32_t height = 8;
 
   /* Adjust height for 8x16 sprites */
   height <<= ((reg[1] & 0x02) >> 1);
@@ -3267,34 +3267,34 @@ void parse_satb_m4(int line)
   object_count = count;
 }
 
-void parse_satb_m5(int line)
+void parse_satb_m5(int32_t line)
 {
   /* Y position */
-  int ypos;
+  int32_t ypos;
 
   /* Sprite height (8,16,24,32 pixels)*/
-  int height;
+  int32_t height;
 
   /* Sprite size data */
-  int size;
+  int32_t size;
 
   /* Sprite link data */
-  int link = 0;
+  int32_t link = 0;
 
   /* Sprite counter */
-  int count = 0;
+  int32_t count = 0;
 
   /* 16 or 20 sprites max. per line */
-  int max = 16 + ((reg[12] & 1) << 2);
+  int32_t max = 16 + ((reg[12] & 1) << 2);
 
   /* 64 or 80 sprites max. */
-  int total = max << 2;
+  int32_t total = max << 2;
 
   /* Pointer to sprite attribute table */
-  uint16 *p = (uint16 *) &vram[satb];
+  uint16_t *p = (uint16_t *) &vram[satb];
 
   /* Pointer to internal RAM */
-  uint16 *q = (uint16 *) &sat[0];
+  uint16_t *q = (uint16_t *) &sat[0];
 
   /* Adjust line offset */
   line += 0x81;
@@ -3347,13 +3347,13 @@ void parse_satb_m5(int line)
 /* Pattern cache update function                                            */
 /*--------------------------------------------------------------------------*/
 
-void update_bg_pattern_cache_m4(int index)
+void update_bg_pattern_cache_m4(int32_t index)
 {
-  int i;
-  uint8 x, y, c;
-  uint8 *dst;
-  uint16 name, bp01, bp23;
-  uint32 bp;
+  int32_t i;
+  uint8_t x, y, c;
+  uint8_t *dst;
+  uint16_t name, bp01, bp23;
+  uint32_t bp;
 
   for(i = 0; i < index; i++)
   {
@@ -3369,8 +3369,8 @@ void update_bg_pattern_cache_m4(int index)
         dst = &bg_pattern_cache[name << 6];
 
         /* Byteplane data */
-        bp01 = *(uint16 *)&vram[(name << 5) | (y << 2) | (0)];
-        bp23 = *(uint16 *)&vram[(name << 5) | (y << 2) | (2)];
+        bp01 = *(uint16_t *)&vram[(name << 5) | (y << 2) | (0)];
+        bp23 = *(uint16_t *)&vram[(name << 5) | (y << 2) | (2)];
 
         /* Convert to pixel line data (4 bytes = 8 pixels)*/
         /* (msb) p7p6 p5p4 p3p2 p1p0 (lsb) */
@@ -3401,13 +3401,13 @@ void update_bg_pattern_cache_m4(int index)
   }
 }
 
-void update_bg_pattern_cache_m5(int index)
+void update_bg_pattern_cache_m5(int32_t index)
 {
-  int i;
-  uint8 x, y, c;
-  uint8 *dst;
-  uint16 name;
-  uint32 bp;
+  int32_t i;
+  uint8_t x, y, c;
+  uint8_t *dst;
+  uint16_t name;
+  uint32_t bp;
 
   for(i = 0; i < index; i++)
   {
@@ -3425,7 +3425,7 @@ void update_bg_pattern_cache_m5(int index)
         /* Byteplane data (one pattern = 4 bytes) */
         /* LIT_ENDIAN: byte0 (lsb) p2p3 p0p1 p6p7 p4p5 (msb) byte3 */
         /* BIG_ENDIAN: byte0 (msb) p0p1 p2p3 p4p5 p6p7 (lsb) byte3 */
-        bp = *(uint32 *)&vram[(name << 5) | (y << 2)];
+        bp = *(uint32_t *)&vram[(name << 5) | (y << 2)];
 
         /* Update cached line (8 pixels = 8 bytes) */
         for(x = 0; x < 8; x ++)
@@ -3465,11 +3465,11 @@ void update_bg_pattern_cache_m5(int index)
 /* Window & Plane A clipping update function                                */
 /*--------------------------------------------------------------------------*/
 
-void window_clip(unsigned int data, unsigned int sw)
+void window_clip(uint32_t data, uint32_t sw)
 {
   /* Window size and invert flags */
-  int hp = (data & 0x1f);
-  int hf = (data >> 7) & 1;
+  int32_t hp = (data & 0x1f);
+  int32_t hf = (data >> 7) & 1;
 
   /* Display width (16 or 20 columns) */
   sw = 16 + (sw << 2);
@@ -3477,8 +3477,8 @@ void window_clip(unsigned int data, unsigned int sw)
   /* Perform horizontal clipping; the results are applied in reverse
      if the horizontal inversion flag is set
    */
-  int a = hf;
-  int w = hf ^ 1;
+  int32_t a = hf;
+  int32_t w = hf ^ 1;
 
   if(hp)
   {
@@ -3516,10 +3516,10 @@ void window_clip(unsigned int data, unsigned int sw)
 
 void render_init(void)
 {
-  int bx, ax;
+  int32_t bx, ax;
 
   /* Initialize layers priority pixel look-up tables */
-  uint16 index;
+  uint16_t index;
   for (bx = 0; bx < 0x100; bx++)
   {
     for (ax = 0; ax < 0x100; ax++)
@@ -3558,20 +3558,21 @@ void render_init(void)
 
 void render_reset(void)
 {
-  /* Clear display bitmap */
-  memset(bitmap.data, 0, bitmap.pitch * bitmap.height);
+	/* FIX THAT SHIT GODDAMNIT, IT CRASHES AND LEAKS MEMORY ON 64-BITS & EMBEDDED HARDWARE */
+	/* Clear display bitmap */
+	/*memset(bitmap.data, 0, bitmap.pitch * bitmap.height);*/
 
-  /* Clear line buffers */
-  memset(linebuf, 0, sizeof(linebuf));
+	/* Clear line buffers */
+	memset(linebuf, 0, sizeof(linebuf));
 
-  /* Clear color palettes */
+	/* Clear color palettes */
 #ifdef NGC
-  memset(&pixel, 0, sizeof(pixel));
+	memset(&pixel, 0, sizeof(pixel));
 #else
-  memset(&pixel_8, 0, sizeof(pixel_8));
-  memset(&pixel_15, 0, sizeof(pixel_15));
-  memset(&pixel_16, 0, sizeof(pixel_16));
-  memset(&pixel_32, 0, sizeof(pixel_32));
+	memset(&pixel_8, 0, sizeof(pixel_8));
+	memset(&pixel_15, 0, sizeof(pixel_15));
+	memset(&pixel_16, 0, sizeof(pixel_16));
+	memset(&pixel_32, 0, sizeof(pixel_32));
 #endif
 }
 
@@ -3580,10 +3581,10 @@ void render_reset(void)
 /* Line rendering functions                                                 */
 /*--------------------------------------------------------------------------*/
 
-void render_line(int line)
+void render_line(int32_t line)
 {
-  int width = bitmap.viewport.w;
-  int x_offset = bitmap.viewport.x;
+  int32_t width = bitmap.viewport.w;
+  int32_t x_offset = bitmap.viewport.x;
 
   /* Check display status */
   if (reg[1] & 0x40)
@@ -3630,17 +3631,17 @@ void render_line(int line)
   remap_line(line);
 }
 
-void blank_line(int line, int offset, int width)
+void blank_line(int32_t line, int32_t offset, int32_t width)
 {
   memset(&linebuf[0][0x20 + offset], 0x40, width);
   remap_line(line);
 }
 
-void remap_line(int line)
+void remap_line(int32_t line)
 {
   /* Line width */
-  int x_offset = bitmap.viewport.x;
-  int width = bitmap.viewport.w + (x_offset << 1);
+  int32_t x_offset = bitmap.viewport.x;
+  int32_t width = bitmap.viewport.w + (x_offset << 1);
 
   /* Adjust line offset in framebuffer */
   line = (line + bitmap.viewport.y) % lines_per_frame;
@@ -3670,8 +3671,8 @@ void remap_line(int line)
     /* One tile is 32 byte = 4x4 pixels */
     /* Tiles are stored continuously in texture memory */
     width >>= 2;
-    uint8 *src = &linebuf[0][0x20 - x_offset];
-    uint16 *dst = (uint16 *) (texturemem + (((width << 5) * (line >> 2)) + ((line & 3) << 3)));
+    uint8_t *src = &linebuf[0][0x20 - x_offset];
+    uint16_t *dst = (uint16_t *) (texturemem + (((width << 5) * (line >> 2)) + ((line & 3) << 3)));
     do
     {
       *dst++ = pixel[*src++];
@@ -3689,16 +3690,16 @@ void remap_line(int line)
   switch(bitmap.depth)
   {
     case 8:
-      remap_8(&linebuf[0][0x20 - x_offset], (uint8 *)out, width);
+      remap_8(&linebuf[0][0x20 - x_offset], (uint8_t *)out, width);
       break;
     case 15:
-      remap_16(&linebuf[0][0x20 - x_offset], (uint16 *)out, width);
+      remap_16(&linebuf[0][0x20 - x_offset], (uint16_t *)out, width);
       break;
     case 16:
-      remap_16(&linebuf[0][0x20 - x_offset], (uint16 *)out, width);
+      remap_16(&linebuf[0][0x20 - x_offset], (uint16_t *)out, width);
       break;
     case 32:
-      remap_32(&linebuf[0][0x20 - x_offset], (uint32 *)out, width);
+      remap_32(&linebuf[0][0x20 - x_offset], (uint32_t *)out, width);
       break;
   }
 #endif

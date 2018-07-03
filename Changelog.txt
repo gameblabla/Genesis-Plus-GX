@@ -1,0 +1,16 @@
+July 3rd 2018
+==============
+
+Switched all variable types to C99 data-types. Doing so fixed 64-bits support as well as weird crashes.
+
+Detected a few memory corruptions with Valgrind and fixed those accordingly.
+
+Added RS-97 support based on the libSDL port.
+
+
+Removals
+========
+
+Removed the GX (Wii and Gamecube) specific code, for mostly maintainability reasons.
+
+The less code, the better.

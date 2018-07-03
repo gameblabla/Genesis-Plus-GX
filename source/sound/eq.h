@@ -19,6 +19,8 @@
 #ifndef __EQ3BAND__
 #define __EQ3BAND__
 
+#include <stdint.h>
+
 // ------------
 //| Structures |
 // ------------
@@ -59,9 +61,9 @@ typedef struct {
 //| Exports |
 // ---------
 
-extern void init_3band_state(EQSTATE * es, int lowfreq, int highfreq,
-           int mixfreq);
-extern double do_3band(EQSTATE * es, int sample);
+extern void init_3band_state(EQSTATE * es, int32_t lowfreq, int32_t highfreq,
+           int32_t mixfreq);
+extern double do_3band(EQSTATE * es, int32_t sample);
 
 
 #endif        // #ifndef __EQ3BAND__

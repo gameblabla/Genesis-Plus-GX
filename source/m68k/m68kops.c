@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "m68kcpu.h"
 #include "m68kCycleAccurate.h"
 

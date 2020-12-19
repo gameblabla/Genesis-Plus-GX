@@ -117,7 +117,9 @@ char* get_save_directory(void) {
         homedir = getpwuid(getuid())->pw_dir;
     }
    
-    char pathname[MAXPATHLEN];
+    char* pathname;
+    
+    pathname = malloc(MAXPATHLEN);
     
 	if(system_hw <= SYSTEM_MARKIII){
 		system_dir = "/saves/sg";
@@ -157,9 +159,10 @@ char* gcw0_get_key_name(int keycode)
 }
 
 char *get_file_name(char *full_path) {
-	char file_name[256];
+	char* file_name;
+	file_name = malloc(256);
 	sprintf(file_name, "%s", basename(full_path));
-	
+
 	/* remove file extension */
 	int i = strlen(file_name) - 1;
 	while ((i > 0) && (file_name[i] != '.')) i--;

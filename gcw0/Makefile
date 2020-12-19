@@ -21,13 +21,15 @@
 NAME	  = gen_gcw0
 SDL-CONFIG = /opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/bin/sdl-config
 
-CC        = /opt/gcw0-toolchain/usr/bin/mipsel-gcw0-linux-uclibc-gcc
+CC        = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
 #CFLAGS    = `$(SDL-CONFIG) --cflags` -03 -fomit-frame-pointer -Wall  -ansi -std=c99  
 #CFLAGS    = `sdl-config --cflags` -O6 -fomit-frame-pointer -Wall -Wno-strict-aliasing -ansi -std=c99
-CFLAGS    = `$(SDL-CONFIG) --cflags` -O3 -fomit-frame-pointer -Wall  -ansi -std=c99 -march=mips32 -mtune=mips32r2 -mhard-float
+CFLAGS    = `$(SDL-CONFIG) --cflags` -Ofast -fomit-frame-pointer -Wall  -ansi -std=c99 -march=mips32r2 -mtune=mips32r2 -flto -mplt -mno-shared -fno-PIC -mframe-header-opt   -mno-fp-exceptions -mno-check-zero-division -fsingle-precision-constant -fdata-sections -ffunction-sections -fsection-anchors -fno-builtin
+CFLAGS   += -finline-limit=60
+
 #-fomit-frame-pointer
 #LDFLAGS   = -g
-DEFINES   = -DLSB_FIRST -DUSE_16BPP_RENDERING -DUSE_LIBVORBIS -DGCWZERO -DALIGN_LONG -DALT_RENDERER
+DEFINES   = -DLSB_FIRST -DUSE_16BPP_RENDERING -DUSE_LIBVORBIS -DGCWZERO -DALIGN_LONG
 
 SRCDIR    = ../core
 INCLUDES  =     -I$(SRCDIR) -I$(SRCDIR)/z80 -I$(SRCDIR)/m68k \
@@ -37,8 +39,10 @@ INCLUDES  =     -I$(SRCDIR) -I$(SRCDIR)/z80 -I$(SRCDIR)/m68k \
 -I/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include/
 #		-I$(SRCDIR)/tremor 
 
-LIBS	  = `$(SDL-CONFIG) --libs --libs` -lz -lm -lSDL_ttf -lSDL_image \
--L/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/lib -lvorbisfile
+LIBS	  = `$(SDL-CONFIG) --libs --libs` -lz -lm -lSDL_ttf -lfreetype -lSDL_image -lpng  \
+-L/opt/rs97-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/lib -lvorbisidec -logg -flto -s -Wl,-z,norelro -Wl,--hash-style=gnu -Wl,--build-id=none -Wl,-O1,--sort-common,--as-needed,--gc-sections -flto -no-pie -s
+
+LIBS		+= -Wl,-zcommon-page-size=2097152 -Wl,-zmax-page-size=2097152 -lhugetlbfs
 
 OBJDIR = ./build_gcw0
 
@@ -128,7 +132,8 @@ OBJECTS	+=	$(OBJDIR)/main.o	\
 all: $(NAME)
 
 $(NAME): $(OBJDIR) $(OBJECTS)
-		$(CC) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
+		$(CC) $(CFLAGS) $(OBJECTS) $(LIBS) -o $@  $(LDFLAGS)
+		hugeedit --data --text $(NAME)
 
 $(OBJDIR) :
 		@[ -d $@ ] || mkdir -p $@

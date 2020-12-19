@@ -18,9 +18,11 @@ typedef struct
 
 typedef struct
 {
+  uint8 hq_psg;
   uint8 hq_fm;
   uint8 filter;
-  uint8 hq_psg;
+  uint8 psgBoostNoise;
+  uint8 dac_bits;
   uint8 ym2612;
   uint8 ym2413;
   int16 psg_preamp;
@@ -50,7 +52,6 @@ typedef struct
   uint8 render;
   t_input_config input[MAX_INPUTS];
   uint8 gcw0_fullscreen;
-  uint8 gcw0_frameskip;
   uint8 keepaspectratio;
   uint8 gg_scanlines;
   uint8 smsmaskleftbar;
@@ -58,21 +59,24 @@ typedef struct
   uint8 lightgun_speed;
   uint8 a_stick;
   uint8 cursor;
+  uint8 deadzone;
+  uint8 optimisations;
+  uint8 renderer;
+#ifdef SDL2
+  SDL_Keycode buttons[8];
+#else
   SDLKey buttons[8];
-  //SDLKey button_a;
-  //SDLKey button_b;
-  //SDLKey button_c;
-  //SDLKey button_x;
-  //SDLKey button_y;
-  //SDLKey button_z;
-  //SDLKey button_start;
-  //SDLKey button_mode;
+#endif
+  uint8 use_sound;
+  uint8 skip_prevention;
 } t_config;
 
 /* Global variables */
 extern t_config config;
+extern t_config configTemp;
 extern void config_save(void);
 extern void set_config_defaults(void);
+extern void save_current_config(void);
 
 #endif /* _CONFIG_H_ */
 

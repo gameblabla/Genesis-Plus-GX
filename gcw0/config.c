@@ -10,7 +10,7 @@ static int config_load(void)
 
     /* open configuration file */
     char fname[MAXPATHLEN];
-    sprintf (fname, "%s%s/config.ini", homedir, DEFAULT_PATH);
+    sprintf (fname, "%s%s/config-new.ini", homedir, DEFAULT_PATH);
     FILE *fp = fopen(fname, "rb");
     if (fp)
     {
@@ -179,7 +179,7 @@ void config_save(void)
   {
     /* Open configuration file */
     char fname[MAXPATHLEN];
-    sprintf (fname, "%s%s/config.ini", homedir, DEFAULT_PATH);
+    sprintf (fname, "%s%s/config-new.ini", homedir, DEFAULT_PATH);
     FILE *fp = fopen(fname, "wb");
     if (fp)
     {
@@ -197,7 +197,7 @@ void save_current_config(void)
 
     /* open configuration file */
     char fname[MAXPATHLEN];
-    sprintf (fname, "%s%s/config.ini", homedir, DEFAULT_PATH);
+    sprintf (fname, "%s%s/config-new.ini", homedir, DEFAULT_PATH);
     FILE *fp = fopen(fname, "rb");
     if (fp)
     {

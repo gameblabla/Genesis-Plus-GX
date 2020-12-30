@@ -24,7 +24,7 @@ SDL-CONFIG = /opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/bin/sd
 CC        = /opt/gcw0-toolchain/usr/bin/mipsel-linux-gcc
 #CFLAGS    = `$(SDL-CONFIG) --cflags` -03 -fomit-frame-pointer -Wall  -ansi -std=c99  
 #CFLAGS    = `sdl-config --cflags` -O6 -fomit-frame-pointer -Wall -Wno-strict-aliasing -ansi -std=c99
-CFLAGS    = `$(SDL-CONFIG) --cflags` -Ofast -fomit-frame-pointer -Wall  -ansi -std=c99 -march=mips32r2 -mtune=mips32r2 -flto -mplt -mno-shared -fno-PIC -mframe-header-opt   -mno-fp-exceptions -mno-check-zero-division -fsingle-precision-constant -fdata-sections -ffunction-sections -fsection-anchors -fno-builtin
+CFLAGS    = `$(SDL-CONFIG) --cflags` -Ofast -fomit-frame-pointer -Wall  -ansi -std=c99 -march=mips32r2 -mtune=mips32r2 -flto -mplt -mno-shared -fno-PIC -mframe-header-opt  -mno-fp-exceptions -mno-check-zero-division -fsingle-precision-constant -fdata-sections -ffunction-sections -fsection-anchors -fno-builtin
 CFLAGS   += -finline-limit=60
 
 #-fomit-frame-pointer

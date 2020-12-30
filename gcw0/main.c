@@ -2472,5 +2472,8 @@ while(i  < 239)
             else    gcw0menu();
         }
     }
+    
+    save_current_config();
+    
     return 0;
 }
